@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Possível: um lugar para conversar, criar, trocar e cuidar." />
+  <title>possível — tudo começa aqui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#inicio" aria-label="Possível início"><span class="brand-dot"></span>possível</a>
+      <p class="eyebrow">seu espaço, do seu jeito</p>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <a class="nav-item active" href="#inicio"><span class="nav-symbol">⌂</span><span>Início</span></a>
+        <a class="nav-item" href="#conexoes"><span class="nav-symbol">◌</span><span>Conexões</span><span class="nav-count">4</span></a>
+        <a class="nav-item" href="#mensagens"><span class="nav-symbol">↗</span><span>Mensagens</span></a>
+        <a class="nav-item" href="#explorar"><span class="nav-symbol">⌕</span><span>Explorar</span></a>
+        <a class="nav-item" href="#mercado"><span class="nav-symbol">◫</span><span>Mercado</span></a>
+      </nav>
+      <div class="sidebar-rule"></div>
+      <p class="eyebrow">também é possível</p>
+      <nav class="secondary-nav" aria-label="Atalhos">
+        <a href="#doar"><span class="tiny-dot coral"></span>Doar e receber</a>
+        <a href="#chamada"><span class="tiny-dot blue"></span>Fazer chamada</a>
+        <a href="#causas"><span class="tiny-dot green"></span>Apoiar causas</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="help-link" id="helpButton">? <span>Como funciona</span></button>
+        <button class="profile-mini" id="profileButton"><div class="avatar avatar-lilac" id="profileAvatar">AM</div><div><strong id="profileName">ana martin</strong><small id="profileHandle">@anamartin</small></div><span class="more-button" aria-hidden="true">•••</span></button>
+      </div>
+    </aside>
+
+    <main class="content" id="inicio">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-dot"></span>possível</div>
+        <div class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="O que você quer encontrar?" aria-label="Buscar" /></div>
+        <div class="top-actions"><button class="icon-button" id="notifyButton" aria-label="Notificações"><span>♢</span><i></i></button><button class="account-button" id="accountButton">Entrar</button><button class="primary-button small" id="newButton">＋ Criar</button></div>
+      </header>
+
+      <section class="welcome" aria-labelledby="welcome-title">
+        <div><p class="section-kicker">sábado, 01 de agosto</p><h1 id="welcome-title">Bom dia, Ana.<br /><em>O que vamos tornar possível?</em></h1></div>
+        <div class="welcome-orbit"><span>∞</span><small>você pode começar<br />por qualquer lugar</small></div>
+      </section>
+
+      <section class="quick-actions" aria-label="Ações rápidas">
+        <button class="action-card action-message" data-compose="Mensagem"><span class="action-icon">↗</span><strong>Mandar mensagem</strong><small>converse com alguém</small></button>
+        <button class="action-card action-video" data-compose="Vídeo"><span class="action-icon">▶</span><strong>Postar um vídeo</strong><small>mostre o que você faz</small></button>
+        <button class="action-card action-call" data-call="true"><span class="action-icon">◉</span><strong>Fazer uma chamada</strong><small>presença também conecta</small></button>
+        <button class="action-card action-give" data-compose="Doação"><span class="action-icon">♡</span><strong>Doar alguma coisa</strong><small>faça circular o que importa</small></button>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="feed-column" id="explorar">
+          <div class="section-heading"><div><span class="section-kicker">da sua comunidade</span><h2>Acontecendo agora</h2></div><button class="filter-button" id="filterButton">Mais recentes <span>⌄</span></button></div>
+          <div class="composer"><div class="avatar avatar-lilac">AM</div><button id="composerButton">Compartilhe algo que tornou seu dia possível...</button><div class="composer-tools"><button data-compose="Foto" aria-label="Adicionar foto">▧</button><button data-compose="Vídeo" aria-label="Adicionar vídeo">▶</button><button data-compose="Local" aria-label="Adicionar localização">⌖</button></div></div>
+          <div class="feed-list" id="feedList">
+            <article class="post" data-post-id="sample-bike" data-search="joão bicicleta projeto comunidade video cidade" data-kind="Vídeo"><div class="post-head"><div class="avatar avatar-sand">JS</div><div class="post-author"><strong>João Silva <span class="verified">✓</span></strong><small>@joaosilva · há 18 min</small></div><button class="more-button">•••</button></div><p>Consertei mais três bicicletas para o projeto <a href="#">#PedalaJunto</a>. Quando a gente compartilha habilidade, a cidade inteira se move. 🚲</p><div class="video-card"><div class="video-art"><div class="play-button">▶</div><span>oficina aberta</span></div><div class="video-caption"><strong>Uma bike, uma nova rota</strong><small>assista ao vídeo · 01:42</small></div></div><div class="post-actions"><button class="like-button">♡ <span>32</span></button><button class="comment-button">◌ <span>8 comentários</span></button><button>↗ <span>Compartilhar</span></button></div></article>
+            <article class="post" data-post-id="sample-books" data-search="marina troca livros biblioteca cultura" data-kind="Troca"><div class="post-head"><div class="avatar avatar-sky">MC</div><div class="post-author"><strong>Marina Costa</strong><small>@marinacosta · há 43 min</small></div><button class="more-button">•••</button></div><p>Troco estes livros por romances brasileiros ou um café passado com calma. Alguém por aqui? <a href="#">#TrocaJusta</a></p><div class="book-image"><div class="book book-one">A<br /><small>paixão segundo<br />G.H.</small></div><div class="book book-two">O<br /><small>avesso da<br />pele</small></div><div class="book book-three">C<br /><small>cem anos<br />de solidão</small></div></div><div class="post-actions"><button class="like-button">♡ <span>18</span></button><button class="comment-button">◌ <span>12 comentários</span></button><button>↗ <span>Compartilhar</span></button></div></article>
+          </div>
+        </section>
+
+        <aside class="right-column">
+          <section class="side-panel impact-panel" id="causas"><div class="panel-top"><span class="section-kicker">seu impacto</span><span class="impact-mark">✦</span></div><h3>Pequenos gestos,<br /><em>grandes caminhos.</em></h3><div class="impact-number">12 <span>ações possíveis<br />neste mês</span></div><div class="progress"><span></span></div><p>Você está a 3 ações de desbloquear o selo <strong>Presença ativa</strong>.</p><button class="text-button">Ver meu impacto <span>→</span></button></section>
+          <section class="side-panel people-panel" id="conexoes"><div class="panel-top"><h3>Pessoas para<br />conhecer</h3><button class="more-button">•••</button></div><div class="person"><div class="avatar avatar-coral">LP</div><div><strong>Luiza Prado</strong><small>ceramista · 3 interesses em comum</small></div><button class="follow-button">＋</button></div><div class="person"><div class="avatar avatar-green">RM</div><div><strong>Rafael Moura</strong><small>cozinha comunitária</small></div><button class="follow-button">＋</button></div><button class="text-button">Ver todas as sugestões <span>→</span></button></section>
+          <section class="side-panel market-panel" id="mercado"><div class="panel-top"><span class="section-kicker">perto de você</span><span class="market-tag">mercado</span></div><h3>Coisas que podem<br /><em>encontrar você.</em></h3><div class="market-items" id="marketItems"><div class="market-item"><div class="market-photo yellow"></div><div><strong>Vaso feito à mão</strong><small>R$ 48 · Vila Madalena</small></div></div><div class="market-item"><div class="market-photo red"></div><div><strong>Kit de hortaliças</strong><small>troca · Pinheiros</small></div></div></div><button class="text-button" id="marketButton">Explorar o mercado <span>→</span></button></section>
+        </aside>
+      </div>
+      <footer class="site-footer"><span>possível · um espaço para fazer circular o que importa</span><span><a href="termos.html">Termos de uso</a><a href="privacidade.html">Privacidade</a></span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <dialog id="composeDialog"><form method="dialog" class="dialog-card"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="section-kicker">criar algo</span><h2 id="dialogTitle">Compartilhe uma possibilidade</h2><textarea id="composeText" placeholder="Escreva o que está acontecendo..." autofocus></textarea><input id="mediaInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" hidden /><div class="media-preview" id="mediaPreview" hidden><button type="button" id="removeMedia" aria-label="Remover mídia">×</button><div id="mediaPreviewContent"></div></div><div class="dialog-footer"><span>Visível para sua comunidade</span><button class="primary-button" value="default" id="publishButton">Publicar</button></div></form></dialog>
+  <dialog id="authDialog"><form method="dialog" class="dialog-card auth-card" id="authForm"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><div class="auth-heading"><span class="brand-dot"></span><span class="section-kicker">sua conta possível</span></div><h2 id="authTitle">Entre para continuar</h2><div class="auth-tabs"><button type="button" class="auth-tab active" data-auth-mode="login">Entrar</button><button type="button" class="auth-tab" data-auth-mode="signup">Criar conta</button></div><div class="auth-fields"><label for="authEmail">E-mail</label><input id="authEmail" type="email" autocomplete="email" placeholder="voce@email.com" required /><label for="authPassword">Senha</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="mínimo de 6 caracteres" minlength="6" required /><div class="signup-only" hidden><label for="authName">Como podemos te chamar?</label><input id="authName" type="text" autocomplete="name" placeholder="Seu nome" minlength="2" /><label for="authHandle">Escolha seu @</label><input id="authHandle" type="text" autocomplete="username" placeholder="seuusuario" pattern="[A-Za-z0-9_]+" /></div></div><button type="button" class="forgot-button" id="forgotPasswordButton">Esqueci minha senha</button><p class="auth-note" id="authNote">Modo local até configurar o Supabase. Depois, sua conta funcionará em qualquer dispositivo.</p><p class="auth-error" id="authError" role="alert"></p><button class="primary-button auth-submit" id="authSubmit" value="default">Entrar</button></form></dialog>
+  <dialog id="profileDialog"><form method="dialog" class="dialog-card auth-card" id="profileForm"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="section-kicker">seu perfil</span><h2>Editar seu espaço</h2><div class="auth-fields"><label for="profileEditName">Nome</label><input id="profileEditName" type="text" minlength="2" required /><label for="profileEditHandle">@usuário</label><input id="profileEditHandle" type="text" pattern="[A-Za-z0-9_]+" required /><label for="profileEditBio">Bio</label><textarea id="profileEditBio" rows="3" placeholder="Conte um pouco sobre você"></textarea></div><p class="auth-error" id="profileError" role="alert"></p><button class="primary-button auth-submit" value="default">Salvar perfil</button></form></dialog>
+  <dialog id="commentsDialog"><form method="dialog" class="dialog-card comments-card" id="commentsForm"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="section-kicker">conversa</span><h2>Comentários</h2><div class="comments-list" id="commentsList"></div><div class="comment-compose"><textarea id="commentText" rows="2" placeholder="Escreva um comentário..."></textarea><button class="primary-button" id="commentSubmit" value="default">Comentar</button></div></form></dialog>
+  <dialog id="messagesDialog"><div class="dialog-card messages-card"><button class="dialog-close" id="closeMessages" aria-label="Fechar">×</button><div class="messages-heading"><div><span class="section-kicker">conversa direta</span><h2>Mensagens</h2></div><span class="live-label">● ao vivo</span></div><label class="message-label" for="recipientSelect">Conversar com</label><select id="recipientSelect"></select><div class="thread" id="messageThread"></div><form class="message-compose" id="messageForm"><input id="messageText" type="text" placeholder="Escreva uma mensagem..." autocomplete="off" required /><button class="primary-button" value="default" aria-label="Enviar mensagem">↗</button></form><p class="auth-note" id="messageNote">Suas conversas ficam privadas.</p></div></dialog>
+  <dialog id="listingDialog"><form method="dialog" class="dialog-card auth-card" id="listingForm"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="section-kicker">mercado</span><h2>Publicar um anúncio</h2><div class="listing-tabs"><button type="button" class="listing-tab active" data-listing-type="venda">Vender</button><button type="button" class="listing-tab" data-listing-type="troca">Trocar</button></div><div class="auth-fields"><label for="listingTitle">O que você está oferecendo?</label><input id="listingTitle" type="text" placeholder="Ex.: Vaso feito à mão" required maxlength="100" /><label for="listingDescription">Descrição</label><textarea id="listingDescription" rows="3" placeholder="Conte detalhes, medidas ou o que você procura"></textarea><label for="listingPrice">Preço <span class="trade-only" hidden>(opcional na troca)</span></label><input id="listingPrice" type="number" min="0" step="0.01" placeholder="0,00" /><label for="listingLocation">Localização</label><input id="listingLocation" type="text" placeholder="Ex.: Pinheiros" required /></div><p class="auth-error" id="listingError" role="alert"></p><button class="primary-button auth-submit" value="default">Publicar anúncio</button></form></dialog>
+  <dialog id="paymentDialog"><form method="dialog" class="dialog-card auth-card" id="paymentForm"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="section-kicker" id="paymentKicker">contribuir</span><h2 id="paymentTitle">Apoiar uma causa</h2><div class="auth-fields"><label for="paymentAmount">Valor</label><input id="paymentAmount" type="number" min="1" step="0.01" placeholder="50,00" required /><label for="paymentPurpose">Para onde vai?</label><input id="paymentPurpose" type="text" placeholder="Ex.: Cesta básica para a comunidade" required /><label for="paymentMethod">Forma de pagamento</label><select id="paymentMethod"><option value="pix">Pix</option><option value="mercadopago">Mercado Pago</option><option value="stripe">Cartão via Stripe</option></select></div><p class="auth-note">O pagamento será processado por um provedor seguro. O site não armazena dados do cartão.</p><p class="auth-error" id="paymentError" role="alert"></p><button class="primary-button auth-submit" value="default" id="paymentSubmit">Continuar para pagamento</button></form></dialog>
+  <dialog id="callDialog"><div class="dialog-card call-card"><button class="dialog-close" id="closeCall" aria-label="Fechar">×</button><div class="messages-heading"><div><span class="section-kicker">presença também conecta</span><h2 id="callTitle">Fazer uma chamada</h2></div><span class="live-label">● privado</span></div><div class="call-mode-tabs"><button type="button" class="call-mode active" data-call-mode="video">Vídeo</button><button type="button" class="call-mode" data-call-mode="audio">Áudio</button></div><video id="localVideo" class="local-video" autoplay muted playsinline></video><div class="call-controls"><button type="button" id="muteCall">Microfone</button><button type="button" id="toggleCamera">Câmera</button><button type="button" class="end-call" id="endCall">Encerrar</button></div><p class="auth-note" id="callNote">Permita câmera e microfone para iniciar sua prévia.</p><button type="button" class="primary-button auth-submit" id="joinCall">Entrar na sala</button></div></dialog>
+  <dialog id="reportDialog"><form method="dialog" class="dialog-card auth-card" id="reportForm"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="section-kicker">cuidar da comunidade</span><h2>Denunciar conteúdo</h2><div class="auth-fields"><label for="reportReason">Motivo</label><select id="reportReason"><option value="spam">Spam ou golpe</option><option value="harassment">Assédio ou discurso de ódio</option><option value="violence">Violência ou ameaça</option><option value="illegal">Conteúdo ilegal</option><option value="other">Outro</option></select><label for="reportDetails">Detalhes</label><textarea id="reportDetails" rows="4" placeholder="Conte o que aconteceu (opcional)"></textarea></div><p class="auth-error" id="reportError" role="alert"></p><button class="primary-button auth-submit" value="default">Enviar denúncia</button></form></dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
