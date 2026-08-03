@@ -11,6 +11,10 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
+drop policy if exists "Perfis públicos podem ser lidos" on public.profiles;
+drop policy if exists "Usuários podem criar o próprio perfil" on public.profiles;
+drop policy if exists "Usuários podem editar o próprio perfil" on public.profiles;
+
 create policy "Perfis públicos podem ser lidos"
   on public.profiles for select using (true);
 create policy "Usuários podem criar o próprio perfil"
@@ -29,7 +33,8 @@ begin
     new.id,
     coalesce(new.raw_user_meta_data ->> 'name', 'Pessoa possível'),
     lower(coalesce(new.raw_user_meta_data ->> 'handle', 'usuario_' || substr(new.id::text, 1, 8)))
-  );
+  )
+  on conflict (id) do nothing;
   return new;
 end;
 $$;
@@ -38,6 +43,14 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute procedure public.handle_new_user();
+
+insert into public.profiles (id, name, handle)
+select
+  u.id,
+  coalesce(u.raw_user_meta_data ->> 'name', 'Pessoa possível'),
+  lower(coalesce(u.raw_user_meta_data ->> 'handle', 'usuario_' || substr(u.id::text, 1, 8)))
+from auth.users as u
+on conflict (id) do nothing;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -86,6 +99,17 @@ alter table public.posts enable row level security;
 alter table public.post_likes enable row level security;
 alter table public.comments enable row level security;
 
+drop policy if exists "Posts públicos podem ser lidos" on public.posts;
+drop policy if exists "Usuários podem criar posts" on public.posts;
+drop policy if exists "Autores podem editar posts" on public.posts;
+drop policy if exists "Autores podem apagar posts" on public.posts;
+drop policy if exists "Curtidas podem ser lidas" on public.post_likes;
+drop policy if exists "Usuários podem curtir" on public.post_likes;
+drop policy if exists "Usuários podem remover a própria curtida" on public.post_likes;
+drop policy if exists "Comentários públicos podem ser lidos" on public.comments;
+drop policy if exists "Usuários podem comentar" on public.comments;
+drop policy if exists "Autores podem apagar comentários" on public.comments;
+
 create policy "Posts públicos podem ser lidos" on public.posts for select using (true);
 create policy "Usuários podem criar posts" on public.posts for insert with check (auth.uid() = author_id);
 create policy "Autores podem editar posts" on public.posts for update using (auth.uid() = author_id) with check (auth.uid() = author_id);
@@ -100,6 +124,11 @@ create policy "Autores podem apagar comentários" on public.comments for delete 
 insert into storage.buckets (id, name, public)
 values ('posts-media', 'posts-media', true)
 on conflict (id) do update set public = true;
+
+drop policy if exists "Mídias públicas podem ser lidas" on storage.objects;
+drop policy if exists "Usuários podem enviar suas mídias" on storage.objects;
+drop policy if exists "Usuários podem atualizar suas mídias" on storage.objects;
+drop policy if exists "Usuários podem apagar suas mídias" on storage.objects;
 
 create policy "Mídias públicas podem ser lidas"
   on storage.objects for select using (bucket_id = 'posts-media');
@@ -120,6 +149,9 @@ create table if not exists public.messages (
 );
 
 alter table public.messages enable row level security;
+drop policy if exists "Usuários podem ler suas mensagens" on public.messages;
+drop policy if exists "Usuários podem enviar mensagens" on public.messages;
+drop policy if exists "Destinatários podem marcar como lida" on public.messages;
 create policy "Usuários podem ler suas mensagens" on public.messages for select using (auth.uid() = sender_id or auth.uid() = receiver_id);
 create policy "Usuários podem enviar mensagens" on public.messages for insert with check (auth.uid() = sender_id);
 create policy "Destinatários podem marcar como lida" on public.messages for update using (auth.uid() = receiver_id) with check (auth.uid() = receiver_id);
@@ -145,6 +177,10 @@ create table if not exists public.listings (
 );
 
 alter table public.listings enable row level security;
+drop policy if exists "Anúncios ativos podem ser lidos" on public.listings;
+drop policy if exists "Usuários podem criar anúncios" on public.listings;
+drop policy if exists "Vendedores podem editar anúncios" on public.listings;
+drop policy if exists "Vendedores podem remover anúncios" on public.listings;
 create policy "Anúncios ativos podem ser lidos" on public.listings for select using (status = 'active' or auth.uid() = seller_id);
 create policy "Usuários podem criar anúncios" on public.listings for insert with check (auth.uid() = seller_id);
 create policy "Vendedores podem editar anúncios" on public.listings for update using (auth.uid() = seller_id) with check (auth.uid() = seller_id);
@@ -170,6 +206,9 @@ create table if not exists public.payments (
 );
 
 alter table public.payments enable row level security;
+drop policy if exists "Usuários podem ver seus pagamentos" on public.payments;
+drop policy if exists "Usuários podem criar seus pagamentos" on public.payments;
+drop policy if exists "Usuários não alteram status do pagamento" on public.payments;
 create policy "Usuários podem ver seus pagamentos" on public.payments for select using (auth.uid() = payer_id);
 create policy "Usuários podem criar seus pagamentos" on public.payments for insert with check (auth.uid() = payer_id);
 create policy "Usuários não alteram status do pagamento" on public.payments for update using (false);
@@ -191,6 +230,9 @@ create table if not exists public.call_sessions (
 );
 
 alter table public.call_sessions enable row level security;
+drop policy if exists "Chamadas ativas podem ser vistas" on public.call_sessions;
+drop policy if exists "Usuários podem criar chamadas" on public.call_sessions;
+drop policy if exists "Criadores podem encerrar chamadas" on public.call_sessions;
 create policy "Chamadas ativas podem ser vistas" on public.call_sessions for select using (status = 'active' or auth.uid() = host_id);
 create policy "Usuários podem criar chamadas" on public.call_sessions for insert with check (auth.uid() = host_id);
 create policy "Criadores podem encerrar chamadas" on public.call_sessions for update using (auth.uid() = host_id) with check (auth.uid() = host_id);
@@ -207,5 +249,7 @@ create table if not exists public.reports (
 );
 
 alter table public.reports enable row level security;
+drop policy if exists "Usuários podem criar denúncias" on public.reports;
+drop policy if exists "Usuários podem ver suas denúncias" on public.reports;
 create policy "Usuários podem criar denúncias" on public.reports for insert with check (auth.uid() = reporter_id);
 create policy "Usuários podem ver suas denúncias" on public.reports for select using (auth.uid() = reporter_id);

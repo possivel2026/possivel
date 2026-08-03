@@ -84,6 +84,36 @@ let messageChannel = null;
 const supabaseReady = Boolean(window.supabase && window.POSSIVEL_SUPABASE?.url && window.POSSIVEL_SUPABASE?.anonKey);
 const supabaseClient = supabaseReady ? window.supabase.createClient(window.POSSIVEL_SUPABASE.url, window.POSSIVEL_SUPABASE.anonKey) : null;
 
+function closeDialog(dialogElement) {
+  if (!dialogElement || !dialogElement.open) return;
+  try {
+    dialogElement.close();
+  } catch (error) {
+    dialogElement.removeAttribute('open');
+  }
+}
+
+function closeAllDialogs(exceptDialog = null) {
+  document.querySelectorAll('dialog').forEach((dialogElement) => {
+    if (dialogElement !== exceptDialog && dialogElement.open) {
+      closeDialog(dialogElement);
+    }
+  });
+}
+
+function openDialog(dialogElement) {
+  if (!dialogElement) return;
+  if (dialogElement.open) return;
+  closeAllDialogs(dialogElement);
+  try {
+    dialogElement.showModal();
+  } catch (error) {
+    if (!dialogElement.open) {
+      dialogElement.setAttribute('open', '');
+    }
+  }
+}
+
 function getUsers() {
   return JSON.parse(localStorage.getItem('possivel-users') || '[]');
 }
@@ -109,8 +139,14 @@ function updateAuthUI() {
 async function updateSupabaseAuthUI() {
   if (!supabaseClient) return;
   const { data: { session } } = await supabaseClient.auth.getSession();
-  const profile = session ? (await supabaseClient.from('profiles').select('name, handle').eq('id', session.user.id).maybeSingle()).data : null;
   if (session) {
+    let profile = (await supabaseClient.from('profiles').select('name, handle').eq('id', session.user.id).maybeSingle()).data;
+    if (!profile) {
+      const fallbackName = session.user.user_metadata?.name || 'Pessoa possível';
+      const fallbackHandle = String(session.user.user_metadata?.handle || `usuario_${session.user.id.slice(0, 8)}`).toLowerCase();
+      const { data: createdProfile, error } = await supabaseClient.from('profiles').insert({ id: session.user.id, name: fallbackName, handle: fallbackHandle }).select('name, handle').single();
+      profile = error ? null : createdProfile;
+    }
     localStorage.setItem('possivel-session', JSON.stringify({ name: profile?.name || session.user.user_metadata?.name || 'Pessoa possível', handle: profile?.handle || 'possivel', email: session.user.email }));
   } else {
     localStorage.removeItem('possivel-session');
@@ -129,7 +165,7 @@ function openAuth(mode = 'login') {
   signupFields.hidden = !signup;
   authName.required = signup;
   authHandle.required = signup;
-  authDialog.showModal();
+  openDialog(authDialog);
   authEmail.focus();
 }
 
@@ -156,7 +192,7 @@ function handleAuthSubmit(event) {
     const user = { name, handle, email, password };
     localStorage.setItem('possivel-users', JSON.stringify([...users, user]));
     localStorage.setItem('possivel-session', JSON.stringify({ name, handle, email }));
-    authDialog.close();
+    closeDialog(authDialog);
     updateAuthUI();
     showToast(`Bem-vinda, ${name.split(' ')[0]}. Sua conta foi criada.`);
     return;
@@ -167,7 +203,7 @@ function handleAuthSubmit(event) {
     return;
   }
   localStorage.setItem('possivel-session', JSON.stringify({ name: user.name, handle: user.handle, email: user.email }));
-  authDialog.close();
+  closeDialog(authDialog);
   updateAuthUI();
   showToast(`Que bom te ver, ${user.name.split(' ')[0]}.`);
 }
@@ -182,7 +218,7 @@ async function handleSupabaseSubmit(email, password) {
       authError.textContent = error.message.includes('already registered') ? 'Este e-mail já possui uma conta.' : error.message;
       return;
     }
-    authDialog.close();
+    closeDialog(authDialog);
     showToast('Conta criada. Verifique seu e-mail para confirmar o acesso.');
     return;
   }
@@ -191,7 +227,7 @@ async function handleSupabaseSubmit(email, password) {
     authError.textContent = 'E-mail ou senha incorretos.';
     return;
   }
-  authDialog.close();
+  closeDialog(authDialog);
   await updateSupabaseAuthUI();
   showToast('Login realizado com sucesso.');
 }
@@ -325,7 +361,7 @@ async function openComments(postId) {
     const comments = JSON.parse(localStorage.getItem('possivel-comments') || '{}');
     renderComments(comments[postId] || []);
   }
-  commentsDialog.showModal();
+  openDialog(commentsDialog);
 }
 
 function renderComments(comments) {
@@ -362,7 +398,7 @@ function openProfileEditor() {
   profileEditName.value = session?.name || '';
   profileEditHandle.value = session?.handle || '';
   profileEditBio.value = session?.bio || '';
-  profileDialog.showModal();
+  openDialog(profileDialog);
 }
 
 async function saveProfile(event) {
@@ -383,7 +419,7 @@ async function saveProfile(event) {
     localStorage.setItem('possivel-users', JSON.stringify(updatedUsers));
     localStorage.setItem('possivel-session', JSON.stringify({ ...session, name, handle, bio }));
   }
-  profileDialog.close();
+  closeDialog(profileDialog);
   await updateSupabaseAuthUI();
   updateAuthUI();
   showToast('Perfil atualizado.');
@@ -402,7 +438,7 @@ async function loadPersistedPosts() {
 async function openMessages() {
   if (!requireLogin()) return;
   await loadMessageRecipients();
-  messagesDialog.showModal();
+  openDialog(messagesDialog);
   if (activeRecipient) await loadMessageThread();
   messageText.focus();
 }
@@ -484,7 +520,7 @@ function openListing() {
   listingType = 'venda';
   document.querySelectorAll('[data-listing-type]').forEach((tab) => tab.classList.toggle('active', tab.dataset.listingType === listingType));
   tradeOnly.hidden = true;
-  listingDialog.showModal();
+  openDialog(listingDialog);
   listingTitle.focus();
 }
 
@@ -517,7 +553,7 @@ async function saveListing(event) {
     localStorage.setItem('possivel-listings', JSON.stringify([listing, ...listings]));
     marketItems.prepend(makeListingItem(listing));
   }
-  listingDialog.close();
+  closeDialog(listingDialog);
   showToast('Anúncio publicado no mercado.');
 }
 
@@ -540,7 +576,7 @@ function openPayment(context = { kind: 'donation' }) {
   paymentAmount.readOnly = purchase;
   paymentPurpose.value = purchase ? context.title : '';
   paymentError.textContent = '';
-  paymentDialog.showModal();
+  openDialog(paymentDialog);
   paymentPurpose.focus();
 }
 
@@ -576,7 +612,7 @@ async function startPayment(event) {
       window.location.href = checkout.checkout_url;
       return;
     }
-    paymentDialog.close();
+    closeDialog(paymentDialog);
     showToast('Pedido registrado. Configure o checkout para concluir o pagamento.');
   } catch (error) {
     paymentError.textContent = error.message || 'Não foi possível iniciar o pagamento.';
@@ -585,7 +621,7 @@ async function startPayment(event) {
 
 async function openCall() {
   if (!requireLogin()) return;
-  callDialog.showModal();
+  openDialog(callDialog);
   callNote.textContent = 'Solicitando acesso à câmera e ao microfone...';
   try {
     callStream = await navigator.mediaDevices.getUserMedia({ video: callMode === 'video', audio: true });
@@ -601,7 +637,7 @@ function stopCall() {
   callStream?.getTracks().forEach((track) => track.stop());
   callStream = null;
   localVideo.srcObject = null;
-  callDialog.close();
+  closeDialog(callDialog);
 }
 
 async function joinCallRoom() {
@@ -627,7 +663,7 @@ function openReport(postId) {
   reportReason.value = 'spam';
   reportDetails.value = '';
   reportError.textContent = '';
-  reportDialog.showModal();
+  openDialog(reportDialog);
 }
 
 async function submitReport(event) {
@@ -646,7 +682,7 @@ async function submitReport(event) {
       reports.push({ postId: reportPostId, reason, details, reporter: getSession().email, createdAt: new Date().toISOString() });
       localStorage.setItem('possivel-reports', JSON.stringify(reports));
     }
-    reportDialog.close();
+    closeDialog(reportDialog);
     showToast('Denúncia recebida. Nossa equipe vai analisar.');
   } catch (error) {
     reportError.textContent = 'Não foi possível enviar a denúncia. Tente novamente.';
@@ -665,7 +701,7 @@ function openComposer(type = 'Post') {
   dialogTitle.textContent = titles[type] || 'Compartilhe uma possibilidade';
   composeText.placeholder = type === 'Mensagem' ? 'Para quem você quer mandar uma mensagem?' : 'Escreva o que está acontecendo...';
   if (type === 'Foto' || type === 'Vídeo') mediaInput.accept = type === 'Foto' ? 'image/jpeg,image/png,image/webp' : 'video/mp4,video/webm';
-  dialog.showModal();
+  openDialog(dialog);
   composeText.focus();
   if (type === 'Foto' || type === 'Vídeo') mediaInput.click();
 }
@@ -719,7 +755,7 @@ document.querySelector('#publishButton').addEventListener('click', async (event)
   }
   composeText.value = '';
   clearSelectedMedia();
-  dialog.close();
+  closeDialog(dialog);
   showToast('Publicado na sua comunidade.');
 });
 document.querySelectorAll('[data-call]').forEach((button) => button.addEventListener('click', openCall));
@@ -750,7 +786,7 @@ document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('
 document.querySelector('.nav-item[href="#mensagens"]').addEventListener('click', (event) => { event.preventDefault(); openMessages(); });
 recipientSelect.addEventListener('change', async () => { activeRecipient = optionToRecipient(recipientSelect.selectedOptions[0]); await loadMessageThread(); });
 messageForm.addEventListener('submit', sendMessage);
-closeMessages.addEventListener('click', () => messagesDialog.close());
+closeMessages.addEventListener('click', () => closeDialog(messagesDialog));
 document.querySelectorAll('[data-auth-mode]').forEach((tab) => tab.addEventListener('click', () => openAuth(tab.dataset.authMode)));
 authForm.addEventListener('submit', handleAuthSubmit);
 accountButton.addEventListener('click', () => {
