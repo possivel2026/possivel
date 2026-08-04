@@ -1,0 +1,2 @@
+import { Redirect } from 'expo-router'; import { useAuthStore } from '@/stores/auth'; import { Screen, Button, s } from '@/components/ui'; import { Text } from 'react-native';
+export default function Index(){const {session,initialized}=useAuthStore(); if(initialized&&session) return <Redirect href="/(tabs)"/>; return <Screen><Text style={s.title}>Possível</Text><Text style={s.muted}>Conexões, impacto, mercado, doações e chamadas em um app seguro.</Text><Button title="Começar" onPress={()=>{}}/><Redirect href="/(auth)/onboarding"/></Screen>}
