@@ -12,7 +12,9 @@ import {
   TextInput,
   View,
   type PressableProps,
+  type StyleProp,
   type TextInputProps,
+  type ViewStyle,
 } from 'react-native';
 
 export const colors = {
@@ -68,7 +70,7 @@ export function Button({
   disabled,
   style,
   ...props
-}: PropsWithChildren<PressableProps & { variant?: 'primary' | 'secondary' | 'danger' | 'ghost'; loading?: boolean }>) {
+}: PropsWithChildren<Omit<PressableProps, 'style'> & { variant?: 'primary' | 'secondary' | 'danger' | 'ghost'; loading?: boolean; style?: StyleProp<ViewStyle> }>) {
   return (
     <Pressable
       {...props}
