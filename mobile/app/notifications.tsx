@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Badge, Card, EmptyState, Header, Loading, Screen, colors, typography } from '@/components/ui';
@@ -18,10 +18,11 @@ export default function NotificationsScreen() {
     return () => { void supabase.removeChannel(channel); };
   }, [client, userId]);
   if (!userId) return <Screen><Loading /></Screen>;
+  const currentUserId = userId;
   async function open(item: NonNullable<typeof notifications.data>[number]) {
-    if (!item.read_at) await markNotificationRead(item.id, userId);
+    if (!item.read_at) await markNotificationRead(item.id, currentUserId);
     if (item.type === 'message' && item.actor_id) router.push(`/chat/${item.actor_id}`);
-    else if (item.link?.startsWith('http')) void import('expo-linking').then(({ openURL }) => openURL(item.link!));
+    else if (item.link?.startsWith('http')) void Linking.openURL(item.link);
     else router.back();
   }
   return <Screen><Header title="Notificações" subtitle="Atualizações da sua conta" right={<Pressable onPress={() => markAll.mutate()}><Text style={styles.link}>Marcar todas</Text></Pressable>} />{notifications.isLoading ? <Loading /> : <FlatList data={notifications.data ?? []} keyExtractor={(item) => String(item.id)} contentContainerStyle={styles.list} refreshing={notifications.isRefetching} onRefresh={() => void notifications.refetch()} renderItem={({ item }) => <Pressable onPress={() => void open(item)}><Card style={!item.read_at ? styles.unread : undefined}><View style={styles.row}><Avatar uri={item.actor?.avatar_url} name={item.actor?.name ?? item.title} /><View style={styles.info}><View style={styles.titleRow}><Text style={styles.title}>{item.title}</Text>{!item.read_at ? <Badge>NOVA</Badge> : null}</View><Text style={typography.muted}>{item.body}</Text><Text style={styles.time}>{new Date(item.created_at).toLocaleString('pt-BR')}</Text></View></View></Card></Pressable>} ListEmptyComponent={<EmptyState title="Tudo em dia" description="Suas notificações aparecerão aqui." />} />}</Screen>;
