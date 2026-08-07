@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Possível Labs: 10 ferramentas gratuitas para dinheiro, produtividade, carreira e negócios." />
+  <meta name="theme-color" content="#07111f" />
+  <title>Possível Labs — 10 ferramentas úteis</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Possível Labs">
+      <span class="brand-mark">P</span><span>Possível <b>Labs</b></span>
+    </a>
+    <nav>
+      <a href="#ferramentas">Ferramentas</a>
+      <a href="#modelo">Como cresce</a>
+      <button id="themeToggle" class="ghost" type="button">Tema</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="hero shell">
+      <div>
+        <span class="eyebrow">ECOSSISTEMA DE MICROPRODUTOS</span>
+        <h1>Ferramentas rápidas para resolver problemas reais.</h1>
+        <p>Dez utilitários gratuitos, leves e prontos para evoluir com login, pagamentos, anúncios, afiliados e API.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#ferramentas">Abrir ferramentas</a>
+          <a class="button secondary" href="https://github.com/possivel2026/possivel" target="_blank" rel="noreferrer">Ver GitHub</a>
+        </div>
+        <div class="metrics">
+          <div><strong>10</strong><span>produtos</span></div>
+          <div><strong>0</strong><span>cadastros exigidos</span></div>
+          <div><strong>100%</strong><span>responsivo</span></div>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <span class="status"><i></i> MVP ativo</span>
+        <h2>Uma base, vários negócios</h2>
+        <p>Cada ferramenta pode virar um produto independente sem duplicar design, infraestrutura ou manutenção.</p>
+        <ul>
+          <li>SEO por ferramenta</li>
+          <li>Dados salvos no dispositivo</li>
+          <li>Arquitetura pronta para backend</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="ferramentas" class="shell section">
+      <div class="section-head">
+        <div><span class="eyebrow">UTILIDADE PRIMEIRO</span><h2>Escolha uma ferramenta</h2></div>
+        <label class="search"><span>⌕</span><input id="searchTools" type="search" placeholder="Buscar ferramenta..." /></label>
+      </div>
+      <div id="toolGrid" class="tool-grid"></div>
+    </section>
+
+    <section id="workspace" class="workspace shell hidden" aria-live="polite">
+      <button id="closeWorkspace" class="back" type="button">← Voltar para ferramentas</button>
+      <div id="workspaceContent"></div>
+    </section>
+
+    <section id="modelo" class="shell section">
+      <div class="section-head"><div><span class="eyebrow">ESCALA INTELIGENTE</span><h2>Modelo de crescimento</h2></div></div>
+      <div class="model-grid">
+        <article><b>1</b><h3>Atrair</h3><p>Ferramentas gratuitas capturam buscas específicas no Google e tráfego social.</p></article>
+        <article><b>2</b><h3>Converter</h3><p>Recursos premium, exportações, histórico e automações aumentam o valor por usuário.</p></article>
+        <article><b>3</b><h3>Reter</h3><p>Conta única, dados sincronizados e notificações transformam visitas em recorrência.</p></article>
+        <article><b>4</b><h3>Monetizar</h3><p>Assinatura, anúncios, afiliados, geração de leads e API para empresas.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <div><strong>Possível Labs</strong><p>Produtos digitais úteis, simples e escaláveis.</p></div>
+    <span>Feito para crescer.</span>
+  </footer>
+
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>
