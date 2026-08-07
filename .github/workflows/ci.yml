@@ -3,6 +3,7 @@ on:
   pull_request:
   push:
     branches-ignore: [main]
+
 jobs:
   web:
     runs-on: ubuntu-latest
@@ -13,17 +14,15 @@ jobs:
           node-version: 22
       - run: node --check script.js
       - run: node tests/static-check.mjs
-  mobile-manifests:
+
+  mobile-static:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validar manifests mobile quando presentes
+      - name: Validar manifests e estrutura mobile
         run: |
-          if [ -f mobile/package.json ]; then
-            node -e "JSON.parse(require('fs').readFileSync('mobile/package.json')); JSON.parse(require('fs').readFileSync('mobile/app.json')); console.log('manifests ok')"
-          else
-            echo "Pasta mobile não encontrada; etapa ignorada."
-          fi
+          node -e "JSON.parse(require('fs').readFileSync('mobile/package.json')); JSON.parse(require('fs').readFileSync('mobile/app.json')); console.log('manifests ok')"
+          node mobile/tests/static-check.mjs

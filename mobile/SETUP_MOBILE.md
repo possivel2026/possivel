@@ -1,8 +1,16 @@
-# Setup Mobile
+# Preparar e testar o aplicativo
 
-1. Copie `.env.example` para `.env`.
-2. Preencha `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_APP_URL` e `EXPO_PUBLIC_LIVEKIT_URL`.
-3. Execute `npm install` dentro de `mobile`.
-4. Rode `npm run start` e abra no Android/Expo Go ou em emulador.
+1. Instale Node.js LTS e Android Studio ou o aplicativo Expo Go.
+2. No terminal, entre na pasta `mobile`.
+3. Execute `npm install`.
+4. Execute `npx expo start`.
+5. Leia o QR Code com o Expo Go ou pressione `a` para abrir o emulador Android.
+6. Entre com a mesma conta usada no site.
 
-Nenhum segredo administrativo deve ser colocado no app. Tokens Mercado Pago, LiveKit secret e service role ficam no Supabase Functions.
+Para gerar APK de teste com EAS:
+
+```bash
+npm install -g eas-cli
+eas login
+eas build --platform android --profile preview
+```
