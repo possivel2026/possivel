@@ -1,14 +1,18 @@
 (() => {
   const capitalize = (value = '') => value.charAt(0).toUpperCase() + value.slice(1);
+  const setText = (element, value) => {
+    if (element && element.textContent !== value) element.textContent = value;
+  };
 
   function formatDate() {
-    const el = document.querySelector('#welcomeDate');
-    if (!el) return;
-    el.textContent = new Intl.DateTimeFormat('pt-BR', {
+    const element = document.querySelector('#welcomeDate');
+    if (!element) return;
+    const value = new Intl.DateTimeFormat('pt-BR', {
       weekday: 'long',
       day: '2-digit',
       month: 'long'
     }).format(new Date());
+    setText(element, value);
   }
 
   function updateGreeting() {
@@ -19,29 +23,23 @@
     if (!greeting || !profileName) return;
 
     const name = profileName.textContent.trim();
-    const loggedIn = name && name.toLowerCase() !== 'visitante';
+    const loggedIn = Boolean(name && name.toLowerCase() !== 'visitante');
     const firstName = loggedIn ? capitalize(name.split(/\s+/)[0]) : 'visitante';
-    greeting.textContent = loggedIn ? `Olá, ${firstName}.` : 'Olá, visitante.';
+    setText(greeting, loggedIn ? `Olá, ${firstName}.` : 'Olá, visitante.');
 
     if (composerAvatar && profileAvatar) {
-      composerAvatar.textContent = profileAvatar.textContent;
+      setText(composerAvatar, profileAvatar.textContent.trim() || 'VP');
     }
   }
 
   function syncEmptyStates() {
     const feed = document.querySelector('#feedList');
     const feedEmpty = document.querySelector('#feedEmptyState');
-    if (feed && feedEmpty) {
-      const hasPosts = Boolean(feed.querySelector('.post'));
-      feedEmpty.hidden = hasPosts;
-    }
+    if (feed && feedEmpty) feedEmpty.hidden = Boolean(feed.querySelector('.post'));
 
     const market = document.querySelector('#marketItems');
     const marketEmpty = document.querySelector('#marketEmptyState');
-    if (market && marketEmpty) {
-      const hasListings = Boolean(market.querySelector('.market-item'));
-      marketEmpty.hidden = hasListings;
-    }
+    if (market && marketEmpty) marketEmpty.hidden = Boolean(market.querySelector('.market-item'));
   }
 
   async function loadRealPeople() {
@@ -79,9 +77,10 @@
           .toUpperCase();
         const item = document.createElement('div');
         item.className = 'person';
-        item.innerHTML = `<div class="avatar avatar-coral">${initials}</div><div><strong></strong><small></small></div>`;
-        item.querySelector('strong').textContent = profile.name || 'Pessoa possível';
-        item.querySelector('small').textContent = `@${profile.handle || 'possivel'}`;
+        item.innerHTML = '<div class="avatar avatar-coral"></div><div><strong></strong><small></small></div>';
+        setText(item.querySelector('.avatar'), initials);
+        setText(item.querySelector('strong'), profile.name || 'Pessoa possível');
+        setText(item.querySelector('small'), `@${profile.handle || 'possivel'}`);
         container.append(item);
       });
     } catch (error) {
@@ -90,14 +89,30 @@
     }
   }
 
+  function observeChanges() {
+    const profileName = document.querySelector('#profileName');
+    const feed = document.querySelector('#feedList');
+    const market = document.querySelector('#marketItems');
+
+    if (profileName) {
+      new MutationObserver(updateGreeting).observe(profileName, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+    }
+
+    [feed, market].filter(Boolean).forEach((element) => {
+      new MutationObserver(syncEmptyStates).observe(element, {
+        childList: true,
+        subtree: true
+      });
+    });
+  }
+
   formatDate();
   updateGreeting();
   syncEmptyStates();
   loadRealPeople();
-
-  const observer = new MutationObserver(() => {
-    updateGreeting();
-    syncEmptyStates();
-  });
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  observeChanges();
 })();
