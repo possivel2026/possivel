@@ -40,16 +40,16 @@ jobs:
         working-directory: mobile
         run: npx expo prebuild --platform android --clean --no-install
 
-      - name: Compilar APK de teste
+      - name: Compilar APK standalone
         working-directory: mobile/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
 
       - name: Publicar APK como artefato
         uses: actions/upload-artifact@v4
         with:
-          name: Possivel-Android-debug
-          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          name: Possivel-Android-standalone
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
