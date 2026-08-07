@@ -14,11 +14,16 @@ jobs:
       - run: node --check script.js
       - run: node tests/static-check.mjs
   mobile-manifests:
-    if: ${{ hashFiles('mobile/package.json') != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node -e "JSON.parse(require('fs').readFileSync('mobile/package.json')); JSON.parse(require('fs').readFileSync('mobile/app.json')); console.log('manifests ok')"
+      - name: Validar manifests mobile quando presentes
+        run: |
+          if [ -f mobile/package.json ]; then
+            node -e "JSON.parse(require('fs').readFileSync('mobile/package.json')); JSON.parse(require('fs').readFileSync('mobile/app.json')); console.log('manifests ok')"
+          else
+            echo "Pasta mobile não encontrada; etapa ignorada."
+          fi
