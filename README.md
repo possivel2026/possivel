@@ -15,8 +15,8 @@ Plataforma social para publicar, conversar, seguir pessoas, vender ou trocar ite
 - mensagens privadas com Supabase Realtime;
 - marketplace com venda, troca, imagem, limite por plano e marcação de vendido;
 - causas/projetos com meta, valor arrecadado e apoios reais;
-- registro de pagamentos e integração preparada para Mercado Pago;
-- chamadas preparadas para LiveKit ou Daily;
+- pagamentos avulsos e assinatura Possível Pro preparados para Mercado Pago;
+- chamadas privadas de áudio/vídeo preparadas para Daily;
 - denúncias, bloqueios no banco, RLS e Storage;
 - painel de impacto com números reais;
 - planos Free e Possível Pro.
@@ -30,8 +30,8 @@ A pasta `mobile/` contém o app Expo/React Native em TypeScript, integrado ao me
 2. Confirme que `supabase-config.js` possui somente a Project URL e a chave pública/anon.
 3. Em Authentication > URL Configuration, adicione:
    - `https://marcelinfreefire153-arch.github.io/possivel/`
-4. Para pagamentos/assinatura, implante as Edge Functions em `supabase/functions/` e configure os secrets descritos em `mobile/PAYMENTS_SETUP.md`.
-5. Para chamadas reais, configure LiveKit ou Daily e preencha `callFunctionUrl`.
+4. Implante as Edge Functions de `supabase/functions/`.
+5. Configure os secrets externos no Supabase.
 
 ## Variáveis externas ainda necessárias
 
@@ -39,9 +39,17 @@ A pasta `mobile/` contém o app Expo/React Native em TypeScript, integrado ao me
 - `MERCADO_PAGO_WEBHOOK_SECRET`
 - `APP_URL`
 - `PAYMENT_WEBHOOK_URL`
-- credenciais do provedor de chamadas
+- `DAILY_API_KEY`
 
 A chave `service_role`, senha do banco e tokens privados nunca devem ser colocados no frontend.
+
+## Edge Functions principais
+
+- `create-subscription-checkout`: inicia assinatura Pro;
+- `payment-webhook`: atualiza assinatura;
+- `create-payment-checkout`: inicia compra ou doação;
+- `payment-events-webhook`: confirma compra ou doação;
+- `create-call-room`: cria sala privada Daily.
 
 ## Testes locais
 
