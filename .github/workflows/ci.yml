@@ -34,3 +34,6 @@ jobs:
       - name: Verificar TypeScript
         working-directory: mobile
         run: npm run typecheck
+      - name: Gerar bundle Android de validação
+        working-directory: mobile
+        run: npx expo export --platform android --output-dir dist
