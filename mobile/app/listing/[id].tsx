@@ -1,0 +1,2 @@
+import { useLocalSearchParams, router } from 'expo-router'; import { Text } from 'react-native'; import { Button, Card, Screen, s } from '@/components/ui';
+export default function Listing(){const {id}=useLocalSearchParams(); return <Screen><Card><Text style={s.title}>Anúncio #{id}</Text><Text>Detalhes, favoritos e contato com o anunciante.</Text><Button title="Conversar com anunciante" onPress={()=>router.push('/(tabs)/messages')}/><Button title="Denunciar" variant="danger"/></Card></Screen>}

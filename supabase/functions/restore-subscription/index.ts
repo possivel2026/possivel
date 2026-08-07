@@ -1,0 +1,2 @@
+import { corsHeaders,json } from '../_shared/cors.ts'; import { userClient } from '../_shared/supabase.ts';
+Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{headers:corsHeaders}); const supa=await userClient(req); const {data:{user}}=await supa.auth.getUser(); if(!user)return json({error:'Não autenticado'},401); return json({ok:true,message:'Restauração preparada para Google Play/Apple quando faturamento in-app for ativado.'});});

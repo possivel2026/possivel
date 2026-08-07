@@ -1,0 +1,2 @@
+import { useLocalSearchParams, router } from 'expo-router'; import { Text } from 'react-native'; import { Button, Card, Screen, s } from '@/components/ui';
+export default function Project(){const {id}=useLocalSearchParams(); return <Screen><Card><Text style={s.title}>Projeto #{id}</Text><Text>Detalhes do projeto, participantes e metas.</Text><Button title="Doar" onPress={()=>router.push(`/project/${id}/donate`)}/></Card></Screen>}
