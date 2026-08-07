@@ -1,10 +1,8 @@
 window.POSSIVEL_SUPABASE = {
-  // Cole aqui a Project URL do Supabase.
-  url: '',
-  // Cole aqui somente a chave anon/public do Supabase.
-  anonKey: '',
-  // URL opcional da Edge Function que cria checkout Stripe/Mercado Pago.
-  checkoutFunctionUrl: '',
-  // URL opcional da Edge Function que cria uma sala/token LiveKit ou Daily.
-  callFunctionUrl: ''
+  url: 'https://nwymsiuwiqyvvmdagzeg.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eW1zaXV3aXF5dnZtZGFnemVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1NDk1MTEsImV4cCI6MjEwMTEyNTUxMX0.PRlMlBncRxJDcbYtteGkQM86vcDlTSyPexsQB402I6Y',
+  checkoutFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-subscription-checkout',
+  paymentFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-payment-checkout',
+  callFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-call-room',
+  proPriceLabel: 'Assinatura mensal'
 };
