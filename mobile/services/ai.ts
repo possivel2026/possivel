@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { normalizeAIMessage } from '@/lib/validation';
 
 export type PossivelAIMode = 'path' | 'post' | 'listing' | 'cause' | 'safety';
 
@@ -10,9 +11,7 @@ export type PossivelAIResult = {
 };
 
 export async function askPossivelAI(message: string, mode: PossivelAIMode = 'path') {
-  const prompt = message.replace(/\s+/g, ' ').trim();
-  if (prompt.length < 3) throw new Error('Conte um pouco mais sobre o que você quer tornar possível.');
-  if (prompt.length > 2000) throw new Error('A mensagem deve ter no máximo 2.000 caracteres.');
+  const prompt = normalizeAIMessage(message);
 
   const { data, error } = await supabase.functions.invoke('possivel-ai', {
     body: { message: prompt, mode },

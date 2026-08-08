@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { assertStrongEnoughNewPassword, normalizeHandle } from '@/lib/validation';
 import type { Profile } from '@/types/database';
 
 export async function signIn(email: string, password: string) {
@@ -7,10 +8,10 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signUp(input: { name: string; handle: string; email: string; password: string }) {
-  const handle = input.handle.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const handle = normalizeHandle(input.handle);
   if (input.name.trim().length < 2) throw new Error('Informe seu nome.');
   if (handle.length < 3) throw new Error('O @usuário precisa ter pelo menos 3 caracteres.');
-  if (input.password.length < 8) throw new Error('Para novas contas, use uma senha com pelo menos 8 caracteres.');
+  assertStrongEnoughNewPassword(input.password);
 
   const { error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
@@ -28,7 +29,7 @@ export async function requestPasswordReset(email: string) {
 }
 
 export async function updatePassword(password: string) {
-  if (password.length < 8) throw new Error('Use uma senha com pelo menos 8 caracteres.');
+  assertStrongEnoughNewPassword(password);
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw error;
 }
@@ -47,7 +48,7 @@ export async function getProfile(userId: string) {
 export async function updateProfile(userId: string, input: Pick<Profile, 'name' | 'handle' | 'bio'> & { avatar_url?: string | null }) {
   const payload = {
     name: input.name.trim(),
-    handle: input.handle.trim().toLowerCase().replace(/[^a-z0-9_]/g, ''),
+    handle: normalizeHandle(input.handle),
     bio: input.bio.trim(),
     ...(input.avatar_url !== undefined ? { avatar_url: input.avatar_url } : {}),
   };
