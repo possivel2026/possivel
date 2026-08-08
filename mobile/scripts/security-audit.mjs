@@ -22,35 +22,19 @@ try {
 
 const vulnerabilities = report.vulnerabilities || {};
 const advisoryFromUrl = (url = '') => String(url).match(/GHSA-[A-Za-z0-9-]+/)?.[0] || null;
+const advisories = [];
 
-function resolveAdvisories(packageName, seen = new Set()) {
-  if (seen.has(packageName)) return [];
-  seen.add(packageName);
-
-  const vulnerability = vulnerabilities[packageName];
-  if (!vulnerability) return [{ id: `unknown:${packageName}`, severity: 'unknown', packageName }];
-
-  const resolved = [];
-  for (const via of vulnerability.via || []) {
-    if (typeof via === 'string') {
-      resolved.push(...resolveAdvisories(via, new Set(seen)));
-      continue;
-    }
-
-    const id = advisoryFromUrl(via?.url);
-    resolved.push({
-      id: id || `unknown:${packageName}:${via?.source ?? via?.title ?? 'advisory'}`,
-      severity: via?.severity || vulnerability.severity || 'unknown',
+for (const [packageName, vulnerability] of Object.entries(vulnerabilities)) {
+  for (const via of vulnerability?.via || []) {
+    if (typeof via === 'string') continue;
+    advisories.push({
+      id: advisoryFromUrl(via?.url),
+      severity: via?.severity || vulnerability?.severity || 'unknown',
       packageName,
       title: via?.title || '',
       url: via?.url || '',
     });
   }
-
-  if (!resolved.length && ['high', 'critical'].includes(vulnerability.severity)) {
-    resolved.push({ id: `unknown:${packageName}`, severity: vulnerability.severity, packageName });
-  }
-  return resolved;
 }
 
 const criticalPackages = Object.entries(vulnerabilities)
@@ -62,28 +46,24 @@ if (criticalPackages.length) {
   process.exit(1);
 }
 
-const highPackages = Object.entries(vulnerabilities)
-  .filter(([, item]) => item?.severity === 'high')
-  .map(([name]) => name);
+const highAdvisories = advisories.filter((item) => item.severity === 'high');
+const unexpectedHigh = highAdvisories.filter((item) => !item.id || !knownUpstream.has(item.id));
+const reportedHighCount = Number(report.metadata?.vulnerabilities?.high ?? 0);
 
-const highLeaves = highPackages.flatMap((name) => resolveAdvisories(name));
-const unexpectedHigh = highLeaves.filter((item) => item.severity === 'high' && !knownUpstream.has(item.id));
-const unknownHigh = highLeaves.filter((item) => item.id.startsWith('unknown:'));
-
-if (unexpectedHigh.length || unknownHigh.length) {
+if (unexpectedHigh.length || (reportedHighCount > 0 && highAdvisories.length === 0)) {
   console.error('Auditoria bloqueada: surgiu vulnerabilidade alta não aprovada pela política temporária.');
-  for (const item of [...unexpectedHigh, ...unknownHigh]) {
-    console.error(`- ${item.id} · ${item.packageName}${item.title ? ` · ${item.title}` : ''}`);
+  for (const item of unexpectedHigh) {
+    console.error(`- ${item.id || 'advisory-sem-id'} · ${item.packageName}${item.title ? ` · ${item.title}` : ''}`);
+  }
+  if (reportedHighCount > 0 && highAdvisories.length === 0) {
+    console.error('- O npm reportou vulnerabilidades altas, mas nenhum advisory raiz pôde ser identificado.');
   }
   process.exit(1);
 }
 
-const observedIds = new Set();
-for (const name of Object.keys(vulnerabilities)) {
-  for (const item of resolveAdvisories(name)) {
-    if (knownUpstream.has(item.id)) observedIds.add(item.id);
-  }
-}
+const observedIds = new Set(
+  advisories.map((item) => item.id).filter((id) => id && knownUpstream.has(id)),
+);
 
 if (observedIds.size) {
   console.warn('Avisos upstream conhecidos no tooling de build (monitorados, não ignorados silenciosamente):');
