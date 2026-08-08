@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.13.1
       - name: Validar JavaScript web
         run: |
           node --check script.js
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.13.1
           cache: npm
           cache-dependency-path: mobile/package.json
       - name: Validar manifests e estrutura mobile
@@ -35,6 +35,9 @@ jobs:
       - name: Instalar dependências mobile
         working-directory: mobile
         run: npm install --no-audit --no-fund
+      - name: Verificar compatibilidade Expo
+        working-directory: mobile
+        run: npx expo install --check
       - name: Auditar dependências de produção
         working-directory: mobile
         run: npm audit --omit=dev --audit-level=high

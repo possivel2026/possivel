@@ -19,7 +19,7 @@ jobs:
       - name: Preparar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.18.1
+          node-version: 22.13.1
           cache: npm
           cache-dependency-path: mobile/package.json
 
@@ -35,6 +35,10 @@ jobs:
       - name: Instalar dependências
         working-directory: mobile
         run: npm install --no-audit --no-fund
+
+      - name: Verificar compatibilidade Expo
+        working-directory: mobile
+        run: npx expo install --check
 
       - name: Gerar projeto Android nativo
         working-directory: mobile
