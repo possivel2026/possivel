@@ -3,7 +3,13 @@ import { PRO_MONTHLY_PRICE_BRL } from './plans.ts';
 
 export type CheckoutInput = { userId: string; email?: string; plan: 'pro' };
 export type CheckoutResult = { checkoutUrl: string; providerSubscriptionId: string };
-export type SubscriptionData = { id: string; status: string; external_reference?: string };
+export type SubscriptionData = {
+  id: string;
+  status: string;
+  external_reference?: string;
+  next_payment_date?: string;
+  date_created?: string;
+};
 export type WebhookEvent = { id: string; type: string; providerSubscriptionId?: string; status?: string; payload: unknown };
 
 export interface PaymentProvider {
@@ -80,7 +86,13 @@ export class MercadoPagoProvider implements PaymentProvider {
       throw new Error('Não foi possível consultar a assinatura no provedor.');
     }
     const data = await res.json();
-    return { id: String(data.id), status: String(data.status), external_reference: data.external_reference };
+    return {
+      id: String(data.id),
+      status: String(data.status),
+      external_reference: data.external_reference ? String(data.external_reference) : undefined,
+      next_payment_date: data.next_payment_date ? String(data.next_payment_date) : undefined,
+      date_created: data.date_created ? String(data.date_created) : undefined,
+    };
   }
 
   async validateWebhook(request: Request) {
