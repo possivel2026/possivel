@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Avatar, Badge, Card, colors, typography } from '@/components/ui';
 import type { Post } from '@/types/database';
+
+function PostVideo({ uri }: { uri: string }) {
+  const player = useVideoPlayer(uri);
+  return <VideoView player={player} style={styles.media} nativeControls contentFit="contain" />;
+}
 
 export function PostCard({
   post,
@@ -49,26 +54,24 @@ export function PostCard({
         <Badge>{post.kind}</Badge>
       </View>
       <Text style={typography.body}>{post.body}</Text>
-      {post.media_url && post.media_type?.startsWith('video') ? (
-        <Video source={{ uri: post.media_url }} style={styles.media} useNativeControls resizeMode={ResizeMode.CONTAIN} />
-      ) : null}
+      {post.media_url && post.media_type?.startsWith('video') ? <PostVideo uri={post.media_url} /> : null}
       {post.media_url && !post.media_type?.startsWith('video') ? (
         <Image source={{ uri: post.media_url }} style={styles.media} resizeMode="cover" />
       ) : null}
       <View style={styles.actions}>
-        <Pressable onPress={() => void like()} style={styles.action} disabled={busy}>
+        <Pressable onPress={() => void like()} style={styles.action} disabled={busy} accessibilityRole="button" accessibilityLabel={post.liked_by_me ? 'Remover curtida' : 'Curtir publicação'}>
           <Ionicons name={post.liked_by_me ? 'heart' : 'heart-outline'} color={post.liked_by_me ? colors.danger : colors.muted} size={22} />
           <Text style={styles.actionText}>{post.likes_count}</Text>
         </Pressable>
-        <Pressable onPress={() => router.push(`/post/${post.id}`)} style={styles.action}>
+        <Pressable onPress={() => router.push(`/post/${post.id}`)} style={styles.action} accessibilityRole="button" accessibilityLabel="Abrir comentários">
           <Ionicons name="chatbubble-outline" color={colors.muted} size={20} />
           <Text style={styles.actionText}>{post.comments_count}</Text>
         </Pressable>
-        <Pressable onPress={() => router.push({ pathname: '/report', params: { postId: String(post.id) } })} style={styles.action}>
+        <Pressable onPress={() => router.push({ pathname: '/report', params: { postId: String(post.id) } })} style={styles.action} accessibilityRole="button" accessibilityLabel="Denunciar publicação">
           <Ionicons name="flag-outline" color={colors.muted} size={19} />
         </Pressable>
         {post.author_id === currentUserId && onDelete ? (
-          <Pressable onPress={confirmDelete} style={[styles.action, styles.deleteAction]}>
+          <Pressable onPress={confirmDelete} style={[styles.action, styles.deleteAction]} accessibilityRole="button" accessibilityLabel="Excluir publicação">
             <Ionicons name="trash-outline" color={colors.danger} size={19} />
           </Pressable>
         ) : null}
