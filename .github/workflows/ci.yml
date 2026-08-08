@@ -19,6 +19,16 @@ jobs:
       - name: Auditoria estática web/backend
         run: node tests/static-check.mjs
 
+  edge-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verificar TypeScript das Edge Functions
+        run: find supabase/functions -name '*.ts' -print0 | xargs -0 deno check
+
   mobile-static:
     runs-on: ubuntu-latest
     steps:
