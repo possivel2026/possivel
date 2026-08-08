@@ -23,6 +23,19 @@ for (const id of ['feedList', 'authDialog', 'composeDialog', 'commentsDialog', '
   if (!html.includes(`id="${id}"`)) throw new Error(`Elemento obrigatório ausente: ${id}`);
 }
 
+const htmlIds = [...html.matchAll(/\sid="([A-Za-z][A-Za-z0-9_-]*)"/g)].map((match) => match[1]);
+const duplicateIds = [...new Set(htmlIds.filter((id, index) => htmlIds.indexOf(id) !== index))];
+if (duplicateIds.length) throw new Error(`IDs HTML duplicados: ${duplicateIds.join(', ')}`);
+
+const webCode = `${fs.readFileSync('script.js', 'utf8')}\n${fs.readFileSync('enhancements.js', 'utf8')}`;
+const referencedIds = new Set([
+  ...[...webCode.matchAll(/\$\('#([A-Za-z][A-Za-z0-9_-]*)'\)/g)].map((match) => match[1]),
+  ...[...webCode.matchAll(/getElementById\(['"]([A-Za-z][A-Za-z0-9_-]*)['"]\)/g)].map((match) => match[1]),
+]);
+for (const id of referencedIds) {
+  if (!htmlIds.includes(id)) throw new Error(`JavaScript referencia ID HTML ausente: ${id}`);
+}
+
 if ((html.match(/@supabase\/supabase-js@2/g) || []).length !== 1) throw new Error('Supabase CDN deve aparecer uma vez.');
 if (!html.includes('Content-Security-Policy')) throw new Error('CSP ausente no site.');
 if (!html.includes('R$ 29,99/mês')) throw new Error('Preço público do Possível Pro incorreto.');
