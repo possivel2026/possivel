@@ -1,4 +1,5 @@
 (()=>{
+  const style=document.createElement('link');style.rel='stylesheet';style.href='./admin.css';document.head.appendChild(style);
   const $=(s,r=document)=>r.querySelector(s);
   const money=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0);
   let client=null;
