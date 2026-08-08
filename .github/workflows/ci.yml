@@ -40,7 +40,7 @@ jobs:
         run: npx expo install --check
       - name: Auditar dependências de produção
         working-directory: mobile
-        run: npm audit --omit=dev --audit-level=high
+        run: node scripts/security-audit.mjs
       - name: Verificar TypeScript
         working-directory: mobile
         run: npm run typecheck
