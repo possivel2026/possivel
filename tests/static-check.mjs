@@ -62,9 +62,10 @@ function collectTextFiles(dir = '.') {
   return out;
 }
 
+const oldOwner = ['marcelinfreefire153', 'arch'].join('-');
 for (const file of collectTextFiles()) {
   const text = fs.readFileSync(file, 'utf8');
-  if (text.includes('marcelinfreefire153-arch')) throw new Error(`URL antiga encontrada em ${file}`);
+  if (text.includes(oldOwner)) throw new Error(`URL antiga encontrada em ${file}`);
 }
 
 console.log('Validação estática concluída.');

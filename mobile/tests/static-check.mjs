@@ -39,7 +39,8 @@ if (appJson.expo.scheme !== 'possivel') throw new Error('Deep link possivel:// n
 if (appJson.expo.userInterfaceStyle !== 'light') throw new Error('Tema mobile deve seguir a identidade visual clara.');
 
 const allCode = required.map((file) => fs.readFileSync(path.join(root, file), 'utf8')).join('\n');
-for (const forbidden of ['TODO: implementar', 'Lorem ipsum', 'Mínimo de 6 caracteres', 'marcelinfreefire153-arch']) {
+const oldOwner = ['marcelinfreefire153', 'arch'].join('-');
+for (const forbidden of ['TODO: implementar', 'Lorem ipsum', 'Mínimo de 6 caracteres', oldOwner]) {
   if (allCode.includes(forbidden)) throw new Error(`Conteúdo incompleto/antigo encontrado: ${forbidden}`);
 }
 
