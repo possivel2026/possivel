@@ -12,8 +12,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --check script.js
-      - run: node tests/static-check.mjs
+      - name: Validar JavaScript web
+        run: |
+          node --check script.js
+          node --check enhancements.js
+      - name: Auditoria estática web/backend
+        run: node tests/static-check.mjs
 
   mobile-static:
     runs-on: ubuntu-latest

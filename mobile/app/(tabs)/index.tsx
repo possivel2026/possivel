@@ -23,6 +23,7 @@ export default function FeedScreen() {
   }, [client]);
 
   if (!userId) return <Screen><Loading /></Screen>;
+
   return (
     <Screen>
       <Header
@@ -30,8 +31,15 @@ export default function FeedScreen() {
         subtitle="Ideias, conexões e impacto"
         right={
           <View style={styles.headerActions}>
-            <Pressable style={styles.iconButton} onPress={() => router.push('/notifications')}><Ionicons name="notifications-outline" size={22} color={colors.text} /></Pressable>
-            <Pressable style={styles.addButton} onPress={() => router.push('/post/create')}><Ionicons name="add" size={26} color="#06120e" /></Pressable>
+            <Pressable style={styles.aiButton} onPress={() => router.push('/ai')} accessibilityLabel="Abrir Possível IA">
+              <Ionicons name="sparkles" size={21} color={colors.primaryDark} />
+            </Pressable>
+            <Pressable style={styles.iconButton} onPress={() => router.push('/notifications')} accessibilityLabel="Notificações">
+              <Ionicons name="notifications-outline" size={22} color={colors.text} />
+            </Pressable>
+            <Pressable style={styles.addButton} onPress={() => router.push('/post/create')} accessibilityLabel="Criar publicação">
+              <Ionicons name="add" size={26} color="#FFFFFF" />
+            </Pressable>
           </View>
         }
       />
@@ -50,10 +58,12 @@ export default function FeedScreen() {
     </Screen>
   );
 }
+
 const styles = StyleSheet.create({
   list: { paddingVertical: 12, gap: 12, paddingBottom: 110 },
-  headerActions: { flexDirection: 'row', gap: 8 },
+  headerActions: { flexDirection: 'row', gap: 7 },
+  aiButton: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.lilac, alignItems: 'center', justifyContent: 'center' },
   iconButton: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   addButton: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  link: { color: colors.primary, fontWeight: '800', marginTop: 8 },
+  link: { color: colors.primaryDark, fontWeight: '800', marginTop: 8 },
 });

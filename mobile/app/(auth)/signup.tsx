@@ -10,6 +10,7 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
   async function submit() {
     setLoading(true);
     try {
@@ -21,6 +22,7 @@ export default function SignupScreen() {
       setLoading(false);
     }
   }
+
   return (
     <Screen scroll>
       <Text style={styles.title}>Criar conta</Text>
@@ -29,11 +31,15 @@ export default function SignupScreen() {
         <Input label="Nome" value={name} onChangeText={setName} placeholder="Seu nome" />
         <Input label="@usuário" value={handle} onChangeText={setHandle} autoCapitalize="none" placeholder="seu_usuario" />
         <Input label="E-mail" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="voce@email.com" />
-        <Input label="Senha" value={password} onChangeText={setPassword} secureTextEntry placeholder="Mínimo de 6 caracteres" />
+        <Input label="Senha" value={password} onChangeText={setPassword} secureTextEntry placeholder="Mínimo de 8 caracteres" />
         <Button loading={loading} onPress={() => void submit()}>Criar conta</Button>
       </Card>
       <Pressable onPress={() => router.back()}><Text style={styles.link}>Voltar para entrar</Text></Pressable>
     </Screen>
   );
 }
-const styles = StyleSheet.create({ title: { color: colors.text, fontSize: 30, fontWeight: '900', marginTop: 42 }, link: { color: colors.primary, textAlign: 'center', fontWeight: '800' } });
+
+const styles = StyleSheet.create({
+  title: { color: colors.text, fontSize: 30, fontWeight: '900', marginTop: 42 },
+  link: { color: colors.primaryDark, textAlign: 'center', fontWeight: '800' },
+});

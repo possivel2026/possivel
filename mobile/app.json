@@ -3,9 +3,9 @@
     "name": "Possível",
     "slug": "possivel",
     "scheme": "possivel",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.possivel.app",

@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,18 +15,21 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const colors = {
-  background: '#07111f',
-  surface: '#0e1b2d',
-  surfaceAlt: '#14243a',
-  border: '#263b55',
-  text: '#f7fbff',
-  muted: '#9eb0c5',
-  primary: '#31d5a5',
-  primaryDark: '#18a77e',
-  danger: '#ff6b7a',
-  warning: '#ffcb6b',
+  background: '#F6F1E8',
+  surface: '#FFFDF8',
+  surfaceAlt: '#F0EBE2',
+  border: '#DED6CA',
+  text: '#202326',
+  muted: '#77756F',
+  primary: '#F56B5D',
+  primaryDark: '#D94F43',
+  danger: '#B3261E',
+  warning: '#9A6700',
+  lilac: '#D9D2F2',
+  mint: '#D9EBE6',
 };
 
 export function Screen({ children, scroll = false }: PropsWithChildren<{ scroll?: boolean }>) {
@@ -38,8 +40,9 @@ export function Screen({ children, scroll = false }: PropsWithChildren<{ scroll?
   ) : (
     <View style={styles.screenContent}>{children}</View>
   );
+
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {content}
       </KeyboardAvoidingView>
@@ -59,7 +62,7 @@ export function Header({ title, subtitle, right }: { title: string; subtitle?: s
   );
 }
 
-export function Card({ children, style }: PropsWithChildren<{ style?: object }>) {
+export function Card({ children, style }: PropsWithChildren<{ style?: StyleProp<ViewStyle> }>) {
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
@@ -71,6 +74,7 @@ export function Button({
   style,
   ...props
 }: PropsWithChildren<Omit<PressableProps, 'style'> & { variant?: 'primary' | 'secondary' | 'danger' | 'ghost'; loading?: boolean; style?: StyleProp<ViewStyle> }>) {
+  const lightText = variant === 'primary' || variant === 'danger';
   return (
     <Pressable
       {...props}
@@ -85,7 +89,20 @@ export function Button({
         style,
       ]}
     >
-      {loading ? <ActivityIndicator color={variant === 'ghost' ? colors.primary : '#06120e'} /> : <Text style={[styles.buttonText, variant === 'ghost' && styles.buttonGhostText]}>{children}</Text>}
+      {loading ? (
+        <ActivityIndicator color={lightText ? '#FFFFFF' : colors.primary} />
+      ) : (
+        <Text
+          style={[
+            styles.buttonText,
+            lightText && styles.buttonLightText,
+            variant === 'secondary' && styles.buttonSecondaryText,
+            variant === 'ghost' && styles.buttonGhostText,
+          ]}
+        >
+          {children}
+        </Text>
+      )}
     </Pressable>
   );
 }
@@ -98,6 +115,7 @@ export function Input({ label, error, multiline, ...props }: TextInputProps & { 
         {...props}
         multiline={multiline}
         placeholderTextColor={colors.muted}
+        selectionColor={colors.primary}
         style={[styles.input, multiline && styles.textarea, props.style]}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -112,7 +130,16 @@ export function Avatar({ uri, name, size = 44 }: { uri?: string | null; name?: s
     .join('')
     .slice(0, 2)
     .toUpperCase();
-  if (uri) return <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: colors.surfaceAlt }} />;
+
+  if (uri) {
+    return (
+      <Image
+        source={{ uri }}
+        style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: colors.surfaceAlt }}
+      />
+    );
+  }
+
   return (
     <View style={[styles.avatarFallback, { width: size, height: size, borderRadius: size / 2 }]}>
       <Text style={[styles.avatarText, { fontSize: Math.max(12, size * 0.34) }]}>{initials}</Text>
@@ -152,7 +179,7 @@ export const typography = StyleSheet.create({
   subtitle: { color: colors.text, fontSize: 18, fontWeight: '700' },
   body: { color: colors.text, fontSize: 15, lineHeight: 22 },
   muted: { color: colors.muted, fontSize: 13, lineHeight: 19 },
-  link: { color: colors.primary, fontWeight: '700' },
+  link: { color: colors.primaryDark, fontWeight: '800' },
 });
 
 const styles = StyleSheet.create({
@@ -160,29 +187,65 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   screenContent: { flex: 1, paddingHorizontal: 16 },
   scrollContent: { flexGrow: 1, padding: 16, gap: 14 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
-  headerTitle: { color: colors.text, fontSize: 26, fontWeight: '900', letterSpacing: -0.6 },
-  headerSubtitle: { color: colors.muted, marginTop: 2 },
-  card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 18, padding: 14, gap: 10 },
-  button: { minHeight: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary, paddingHorizontal: 16 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13 },
+  headerTitle: { color: colors.text, fontSize: 28, fontWeight: '900', letterSpacing: -0.8 },
+  headerSubtitle: { color: colors.muted, marginTop: 3 },
+  card: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 20,
+    padding: 15,
+    gap: 10,
+    shadowColor: '#2A211A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 18,
+    elevation: 2,
+  },
+  button: {
+    minHeight: 48,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 16,
+  },
   buttonSecondary: { backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: colors.border },
   buttonDanger: { backgroundColor: colors.danger },
   buttonGhost: { backgroundColor: 'transparent' },
-  buttonText: { color: '#06120e', fontWeight: '800', fontSize: 15 },
-  buttonGhostText: { color: colors.primary },
+  buttonText: { color: colors.text, fontWeight: '800', fontSize: 15 },
+  buttonLightText: { color: '#FFFFFF' },
+  buttonSecondaryText: { color: colors.text },
+  buttonGhostText: { color: colors.primaryDark },
   buttonDisabled: { opacity: 0.45 },
-  pressed: { opacity: 0.75 },
+  pressed: { opacity: 0.78, transform: [{ scale: 0.99 }] },
   inputGroup: { gap: 6 },
-  label: { color: colors.text, fontWeight: '700', fontSize: 13 },
-  input: { minHeight: 48, borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingHorizontal: 14, color: colors.text, backgroundColor: colors.surfaceAlt, fontSize: 15 },
-  textarea: { minHeight: 120, paddingTop: 12, textAlignVertical: 'top' },
+  label: { color: colors.text, fontWeight: '800', fontSize: 13 },
+  input: {
+    minHeight: 50,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 15,
+    paddingHorizontal: 14,
+    color: colors.text,
+    backgroundColor: '#FFFFFF',
+    fontSize: 15,
+  },
+  textarea: { minHeight: 124, paddingTop: 12, textAlignVertical: 'top' },
   error: { color: colors.danger, fontSize: 12 },
-  avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primaryDark },
+  avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.lilac },
   avatarText: { color: colors.text, fontWeight: '900' },
   center: { flex: 1, minHeight: 220, alignItems: 'center', justifyContent: 'center', gap: 12 },
   muted: { color: colors.muted, textAlign: 'center' },
   empty: { alignItems: 'center', justifyContent: 'center', marginVertical: 20, gap: 10 },
-  emptyTitle: { color: colors.text, fontSize: 18, fontWeight: '800', textAlign: 'center' },
-  badge: { alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4, backgroundColor: 'rgba(49,213,165,0.15)' },
-  badgeText: { color: colors.primary, fontSize: 11, fontWeight: '800' },
+  emptyTitle: { color: colors.text, fontSize: 18, fontWeight: '900', textAlign: 'center' },
+  badge: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(245,107,93,0.12)',
+  },
+  badgeText: { color: colors.primaryDark, fontSize: 11, fontWeight: '900' },
 });

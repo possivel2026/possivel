@@ -7,9 +7,12 @@ async function createMeetingToken(apiKey: string, properties: Record<string, unk
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ properties }),
   });
-  if (!response.ok) throw new Error(await response.text());
+  if (!response.ok) {
+    console.error('daily meeting token:', response.status, await response.text());
+    throw new Error('Não foi possível criar o acesso privado à chamada.');
+  }
   const data = await response.json();
-  if (!data.token) throw new Error('Daily não retornou o token da reunião.');
+  if (!data.token) throw new Error('O provedor não retornou o token da reunião.');
   return String(data.token);
 }
 
@@ -25,10 +28,22 @@ Deno.serve(async (req) => {
   if (!['audio', 'video'].includes(mode)) return json({ error: 'Modo inválido' }, 400);
   if (recipientId === user.id) return json({ error: 'Você não pode ligar para si mesmo' }, 400);
 
-  const apiKey = Deno.env.get('DAILY_API_KEY');
-  if (!apiKey) return json({ error: 'DAILY_API_KEY não configurada' }, 500);
-
   const db = admin();
+  if (recipientId) {
+    const { data: recipient } = await db.from('profiles').select('id,name').eq('id', recipientId).maybeSingle();
+    if (!recipient) return json({ error: 'Pessoa não encontrada.' }, 404);
+
+    const { data: blocks } = await db
+      .from('user_blocks')
+      .select('blocker_id,blocked_id')
+      .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${recipientId}),and(blocker_id.eq.${recipientId},blocked_id.eq.${user.id})`)
+      .limit(1);
+    if (blocks?.length) return json({ error: 'A chamada não pode ser iniciada entre estas contas.' }, 403);
+  }
+
+  const apiKey = Deno.env.get('DAILY_API_KEY');
+  if (!apiKey) return json({ error: 'Chamadas ainda não configuradas.' }, 503);
+
   const { data: hostProfile } = await db.from('profiles').select('name').eq('id', user.id).maybeSingle();
   const { data: recipientProfile } = recipientId
     ? await db.from('profiles').select('name').eq('id', recipientId).maybeSingle()
@@ -51,14 +66,29 @@ Deno.serve(async (req) => {
     }),
   });
 
-  if (!response.ok) return json({ error: await response.text() }, 502);
+  if (!response.ok) {
+    console.error('daily room:', response.status, await response.text());
+    return json({ error: 'O serviço de chamadas está temporariamente indisponível.' }, 502);
+  }
   const room = await response.json();
 
   try {
     const [hostToken, guestToken] = await Promise.all([
-      createMeetingToken(apiKey, { room_name: roomName, exp: expiresAt, is_owner: true, user_id: user.id, user_name: hostProfile?.name ?? 'Anfitrião' }),
+      createMeetingToken(apiKey, {
+        room_name: roomName,
+        exp: expiresAt,
+        is_owner: true,
+        user_id: user.id,
+        user_name: hostProfile?.name ?? 'Anfitrião',
+      }),
       recipientId
-        ? createMeetingToken(apiKey, { room_name: roomName, exp: expiresAt, is_owner: false, user_id: recipientId, user_name: recipientProfile?.name ?? 'Convidado' })
+        ? createMeetingToken(apiKey, {
+            room_name: roomName,
+            exp: expiresAt,
+            is_owner: false,
+            user_id: recipientId,
+            user_name: recipientProfile?.name ?? 'Convidado',
+          })
         : Promise.resolve(null),
     ]);
 
@@ -70,7 +100,10 @@ Deno.serve(async (req) => {
       mode,
       status: 'active',
     }).select('id').single();
-    if (sessionError) return json({ error: sessionError.message }, 400);
+    if (sessionError) {
+      console.error('call session:', sessionError);
+      return json({ error: 'Não foi possível registrar a chamada.' }, 400);
+    }
 
     const hostUrl = `${room.url}?t=${encodeURIComponent(hostToken)}`;
     if (recipientId && guestToken) {
@@ -87,6 +120,7 @@ Deno.serve(async (req) => {
 
     return json({ room_url: hostUrl, session_id: session.id, expires_at: expiresAt });
   } catch (error) {
+    console.error('call access:', error);
     return json({ error: error instanceof Error ? error.message : 'Falha ao criar acesso à chamada' }, 502);
   }
 });

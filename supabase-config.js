@@ -4,5 +4,6 @@ window.POSSIVEL_SUPABASE = {
   checkoutFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-subscription-checkout',
   paymentFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-payment-checkout',
   callFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-call-room',
-  proPriceLabel: 'Assinatura mensal'
+  aiFunctionName: 'possivel-ai',
+  proPriceLabel: 'R$ 29,99/mês'
 };

@@ -10,7 +10,8 @@ export async function signUp(input: { name: string; handle: string; email: strin
   const handle = input.handle.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
   if (input.name.trim().length < 2) throw new Error('Informe seu nome.');
   if (handle.length < 3) throw new Error('O @usuário precisa ter pelo menos 3 caracteres.');
-  if (input.password.length < 6) throw new Error('A senha precisa ter pelo menos 6 caracteres.');
+  if (input.password.length < 8) throw new Error('Para novas contas, use uma senha com pelo menos 8 caracteres.');
+
   const { error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
     password: input.password,
@@ -27,7 +28,7 @@ export async function requestPasswordReset(email: string) {
 }
 
 export async function updatePassword(password: string) {
-  if (password.length < 6) throw new Error('A senha precisa ter pelo menos 6 caracteres.');
+  if (password.length < 8) throw new Error('Use uma senha com pelo menos 8 caracteres.');
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw error;
 }
