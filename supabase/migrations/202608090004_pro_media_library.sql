@@ -14,6 +14,35 @@ create table if not exists public.pro_media_library (
   created_at timestamptz not null default now()
 );
 
+create or replace function public.enforce_pro_media_quota()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  used_bytes bigint;
+begin
+  select coalesce(sum(size_bytes), 0)
+    into used_bytes
+  from public.pro_media_library
+  where owner_id = new.owner_id;
+
+  if used_bytes + new.size_bytes > 2147483648 then
+    raise exception 'Limite da nuvem Pro de 2 GB atingido';
+  end if;
+
+  return new;
+end;
+$$;
+
+revoke all on function public.enforce_pro_media_quota() from public, anon, authenticated;
+
+drop trigger if exists pro_media_library_quota on public.pro_media_library;
+create trigger pro_media_library_quota
+before insert on public.pro_media_library
+for each row execute function public.enforce_pro_media_quota();
+
 alter table public.pro_media_library enable row level security;
 
 drop policy if exists pro_media_library_select_own on public.pro_media_library;
