@@ -8,6 +8,8 @@ import { Badge, Button, Card, EmptyState, Header, Loading, Screen, colors, typog
 import { deleteProMedia, fetchProMediaLibrary, getErrorMessage, getPlan, getProMediaSignedUrl, uploadProMedia, type ProMediaItem, type ProMediaKind } from '@/services/app';
 import { useAuthStore } from '@/stores/auth';
 
+const PRO_CLOUD_LIMIT_BYTES = 2 * 1024 * 1024 * 1024;
+
 const categories: Array<{ key: ProMediaKind; label: string; icon: keyof typeof Ionicons.glyphMap; types: string[] }> = [
   { key: 'movie', label: 'Filmes', icon: 'film-outline', types: ['video/mp4', 'video/webm'] },
   { key: 'series', label: 'Séries', icon: 'tv-outline', types: ['video/mp4', 'video/webm'] },
@@ -16,8 +18,9 @@ const categories: Array<{ key: ProMediaKind; label: string; icon: keyof typeof I
 ];
 
 function bytesLabel(bytes: number) {
-  if (!bytes) return 'tamanho não informado';
+  if (!bytes) return '0 MB';
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
   return `${(bytes / 1024 / 1024).toFixed(bytes >= 100 * 1024 * 1024 ? 0 : 1)} MB`;
 }
 
@@ -27,6 +30,7 @@ export default function ProLibraryScreen() {
   const client = useQueryClient();
   const plan = useQuery({ queryKey: ['plan', userId], queryFn: () => getPlan(userId!), enabled: Boolean(userId) });
   const library = useQuery({ queryKey: ['pro-media-library', userId], queryFn: () => fetchProMediaLibrary(userId!), enabled: Boolean(userId) && plan.data?.plan === 'pro' });
+  const usedBytes = useMemo(() => (library.data ?? []).reduce((total, item) => total + Number(item.size_bytes || 0), 0), [library.data]);
 
   const upload = useMutation({
     mutationFn: async () => {
@@ -36,7 +40,9 @@ export default function ProLibraryScreen() {
       if (picked.canceled) return null;
       const asset = picked.assets[0];
       if (!asset) throw new Error('Nenhum arquivo foi selecionado.');
-      if ((asset.size ?? 0) > 500 * 1024 * 1024) throw new Error('O arquivo deve ter no máximo 500 MB nesta versão.');
+      const assetSize = Number(asset.size || 0);
+      if (assetSize > 500 * 1024 * 1024) throw new Error('O arquivo deve ter no máximo 500 MB nesta versão.');
+      if (usedBytes + assetSize > PRO_CLOUD_LIMIT_BYTES) throw new Error('Sua nuvem Pro de 2 GB não tem espaço suficiente para este arquivo.');
       const defaultTitle = asset.name.replace(/\.[^.]+$/, '').slice(0, 180);
       return new Promise<ProMediaItem | null>((resolve, reject) => {
         Alert.alert(
@@ -103,6 +109,7 @@ export default function ProLibraryScreen() {
             <Badge>PRO</Badge>
             <Text style={styles.title}>Biblioteca Pro</Text>
             <Text style={typography.muted}>Salve na nuvem conteúdo próprio, licenciado ou em domínio público e acesse em seus dispositivos.</Text>
+            <Text style={styles.usage}>Nuvem: {bytesLabel(usedBytes)} de 2 GB usados</Text>
           </View>
           <Ionicons name="cloud-done-outline" size={42} color={colors.primary} />
         </View>
@@ -118,7 +125,7 @@ export default function ProLibraryScreen() {
       </View>
 
       <Button loading={upload.isPending} onPress={() => upload.mutate()}>＋ Salvar arquivo na nuvem</Button>
-      <Text style={typography.muted}>Nesta versão, cada arquivo pode ter até 500 MB. Conteúdo comercial de terceiros só pode entrar por parceria/licenciamento.</Text>
+      <Text style={typography.muted}>Cada arquivo pode ter até 500 MB. Conteúdo comercial de terceiros só pode entrar por parceria/licenciamento.</Text>
 
       {library.isLoading ? <Loading label="Carregando sua biblioteca..." /> : filtered.length === 0 ? (
         <EmptyState title={`Nenhum item em ${categories.find((item) => item.key === kind)?.label ?? 'sua biblioteca'}`} description="Adicione um arquivo autorizado para começar." />
@@ -144,6 +151,7 @@ export default function ProLibraryScreen() {
 const styles = StyleSheet.create({
   locked: { alignItems: 'center', gap: 12, paddingVertical: 28 },
   title: { color: colors.text, fontSize: 24, fontWeight: '900' },
+  usage: { color: colors.primaryDark, fontWeight: '900', marginTop: 8 },
   heroRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   categories: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   category: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 12, minHeight: 42, borderRadius: 14, backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: colors.border },
