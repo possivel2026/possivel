@@ -19,7 +19,7 @@ const pro = [
   'Possível Play: filmes e séries autorizados',
   'Leitura de livros virtuais',
   'Músicas e áudios na Biblioteca Pro',
-  'Nuvem pessoal privada para conteúdo próprio/licenciado',
+  '2 GB de nuvem pessoal privada para conteúdo próprio/licenciado',
   'Acesso em seus dispositivos com links temporários protegidos',
   'Estatísticas avançadas',
   'Selo PRO e recursos exclusivos',
