@@ -23,7 +23,7 @@
   }
 
   function setupPriceAndPayment() {
-    setText('#proPrice', config.proPriceLabel || 'R$ 29,99/mês');
+    setText('#proPrice', config.proPriceLabel || 'R$ 15,99/mês');
 
     const provider = $('#paymentProvider');
     if (provider) {
