@@ -4,6 +4,6 @@
   "version": "1.0.0",
   "engines": { "node": ">=18" },
   "dependencies": {
-    "mercadopago": "3.2.1"
+    "mercadopago": "3.0.0"
   }
 }
