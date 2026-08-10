@@ -15,9 +15,11 @@ export default function ProfileScreen() {
   const listings = useQuery({ queryKey: ['profile-listings', userId], queryFn: async () => (await fetchListings()).filter((item) => item.seller_id === userId), enabled: Boolean(userId) });
   const causes = useQuery({ queryKey: ['profile-causes', userId], queryFn: async () => (await fetchCauses()).filter((item) => item.creator_id === userId), enabled: Boolean(userId) });
   if (!userId || !profile) return <Screen><Loading label="Carregando perfil..." /></Screen>;
+
   async function logout() {
     try { await signOut(); router.replace('/(auth)/login'); } catch (error) { Alert.alert('Erro', getErrorMessage(error)); }
   }
+
   return (
     <Screen scroll>
       <Header title="Perfil" subtitle={session.user.email ?? undefined} right={<Pressable style={styles.icon} onPress={() => router.push('/settings')}><Ionicons name="settings-outline" size={22} color={colors.text} /></Pressable>} />
@@ -29,12 +31,17 @@ export default function ProfileScreen() {
         {profile.bio ? <Text style={styles.bio}>{profile.bio}</Text> : <Text style={typography.muted}>Adicione uma bio para apresentar seu perfil.</Text>}
         <Button style={styles.full} onPress={() => router.push('/edit-profile')}>Editar perfil</Button>
       </Card>
+
       <View style={styles.stats}>
         <Card style={styles.stat}><Text style={styles.statNumber}>{posts.data?.length ?? 0}</Text><Text style={typography.muted}>Publicações</Text></Card>
         <Card style={styles.stat}><Text style={styles.statNumber}>{listings.data?.length ?? 0}</Text><Text style={typography.muted}>Anúncios</Text></Card>
         <Card style={styles.stat}><Text style={styles.statNumber}>{causes.data?.length ?? 0}</Text><Text style={typography.muted}>Causas</Text></Card>
       </View>
+
       <Card>
+        <Pressable style={styles.menu} onPress={() => router.push('/connections')}><Ionicons name="people-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Conexões</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
+        <Pressable style={styles.menu} onPress={() => router.push('/marketplace')}><Ionicons name="storefront-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Mercado</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
+        <Pressable style={styles.menu} onPress={() => router.push('/projects')}><Ionicons name="heart-circle-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Causas</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
         <Pressable style={styles.menu} onPress={() => router.push('/pro-library')}><Ionicons name="play-circle-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Possível Play e Biblioteca Pro</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
         <Pressable style={styles.menu} onPress={() => router.push('/plans')}><Ionicons name="diamond-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Planos Free e Pro</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
         <Pressable style={styles.menu} onPress={() => router.push('/notifications')}><Ionicons name="notifications-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Notificações</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
@@ -44,6 +51,7 @@ export default function ProfileScreen() {
     </Screen>
   );
 }
+
 const styles = StyleSheet.create({
   icon: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   profileCard: { alignItems: 'center' },
