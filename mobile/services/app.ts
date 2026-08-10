@@ -7,3 +7,4 @@ export * from './marketplace';
 export * from './causes';
 export * from './account';
 export * from './ai';
+export * from './proMedia';
