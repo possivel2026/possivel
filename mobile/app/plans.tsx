@@ -4,8 +4,26 @@ import { Badge, Button, Card, Header, Loading, Screen, colors, typography } from
 import { cancelSubscription, getErrorMessage, getPlan, startProCheckout } from '@/services/app';
 import { useAuthStore } from '@/stores/auth';
 
-const free = ['5 anúncios ativos', '1 GB de mídia', 'Chamadas com até 4 pessoas', 'Até 30 min por chamada', '5 usos da Possível IA por dia'];
-const pro = ['50 anúncios ativos', '10 GB de mídia', 'Chamadas com até 12 pessoas', 'Até 120 min por chamada', '100 usos da Possível IA por dia', 'Estatísticas avançadas', 'Selo PRO e recursos exclusivos'];
+const free = [
+  '5 anúncios ativos',
+  '1 GB de mídia social',
+  'Mensagens e conexões',
+  '5 usos da Possível IA por dia',
+  'Feed, mercado e causas',
+];
+
+const pro = [
+  '50 anúncios ativos',
+  '10 GB de mídia social',
+  '100 usos da Possível IA por dia',
+  'Possível Play: filmes e séries autorizados',
+  'Leitura de livros virtuais',
+  'Músicas e áudios na Biblioteca Pro',
+  'Nuvem pessoal privada para conteúdo próprio/licenciado',
+  'Acesso em seus dispositivos com links temporários protegidos',
+  'Estatísticas avançadas',
+  'Selo PRO e recursos exclusivos',
+];
 
 export default function PlansScreen() {
   const userId = useAuthStore((state) => state.session?.user.id);
@@ -19,7 +37,7 @@ export default function PlansScreen() {
 
   return (
     <Screen scroll>
-      <Header title="Planos" subtitle="Escolha os limites ideais para você" />
+      <Header title="Planos" subtitle="Escolha os recursos ideais para você" />
       <PlanCard name="Free" price="R$ 0" active={current === 'free'} items={free} />
       <PlanCard name="Possível Pro" price="R$ 29,99/mês" active={current === 'pro'} items={pro} pro />
       {current === 'free' ? (
@@ -30,6 +48,7 @@ export default function PlansScreen() {
           <Button variant="danger" loading={cancel.isPending} onPress={() => Alert.alert('Cancelar assinatura', 'Você manterá os benefícios até o fim do período já pago.', [{ text: 'Voltar', style: 'cancel' }, { text: 'Cancelar plano', style: 'destructive', onPress: () => cancel.mutate() }])}>Cancelar assinatura</Button>
         </>
       )}
+      <Text style={typography.muted}>Filmes, séries, livros e músicas comerciais só podem ser oferecidos pelo Possível quando houver autorização, licença ou conteúdo em domínio público. Arquivos pessoais na nuvem devem ser seus ou estar legalmente autorizados.</Text>
       <Text style={typography.muted}>A assinatura é processada no servidor pelo Mercado Pago. Nunca envie dados de pagamento por mensagem ou pela Possível IA.</Text>
     </Screen>
   );
