@@ -39,9 +39,9 @@ export default function PlansScreen() {
     <Screen scroll>
       <Header title="Planos" subtitle="Escolha os recursos ideais para você" />
       <PlanCard name="Free" price="R$ 0" active={current === 'free'} items={free} />
-      <PlanCard name="Possível Pro" price="R$ 29,99/mês" active={current === 'pro'} items={pro} pro />
+      <PlanCard name="Possível Pro" price="R$ 15,99/mês" active={current === 'pro'} items={pro} pro />
       {current === 'free' ? (
-        <Button loading={checkout.isPending} onPress={() => checkout.mutate()}>Assinar Possível Pro · R$ 29,99/mês</Button>
+        <Button loading={checkout.isPending} onPress={() => checkout.mutate()}>Assinar Possível Pro · R$ 15,99/mês</Button>
       ) : (
         <>
           <Badge>Seu plano atual é PRO</Badge>
