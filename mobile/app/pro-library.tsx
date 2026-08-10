@@ -35,6 +35,7 @@ export default function ProLibraryScreen() {
       const picked = await DocumentPicker.getDocumentAsync({ type: category.types, multiple: false, copyToCacheDirectory: true });
       if (picked.canceled) return null;
       const asset = picked.assets[0];
+      if (!asset) throw new Error('Nenhum arquivo foi selecionado.');
       if ((asset.size ?? 0) > 500 * 1024 * 1024) throw new Error('O arquivo deve ter no máximo 500 MB nesta versão.');
       const defaultTitle = asset.name.replace(/\.[^.]+$/, '').slice(0, 180);
       return new Promise<ProMediaItem | null>((resolve, reject) => {
