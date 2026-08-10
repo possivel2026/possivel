@@ -34,8 +34,8 @@ export default function FeedScreen() {
             <Pressable style={styles.aiButton} onPress={() => router.push('/ai')} accessibilityLabel="Abrir Possível IA">
               <Ionicons name="sparkles" size={21} color={colors.primaryDark} />
             </Pressable>
-            <Pressable style={styles.iconButton} onPress={() => router.push('/notifications')} accessibilityLabel="Notificações">
-              <Ionicons name="notifications-outline" size={22} color={colors.text} />
+            <Pressable style={styles.iconButton} onPress={() => router.push('/profile')} accessibilityLabel="Abrir perfil e mais opções">
+              <Ionicons name="person-circle-outline" size={23} color={colors.text} />
             </Pressable>
             <Pressable style={styles.addButton} onPress={() => router.push('/post/create')} accessibilityLabel="Criar publicação">
               <Ionicons name="add" size={26} color="#FFFFFF" />
