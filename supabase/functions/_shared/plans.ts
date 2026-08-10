@@ -1,4 +1,4 @@
-export const PRO_MONTHLY_PRICE_BRL = 29.99;
+export const PRO_MONTHLY_PRICE_BRL = 15.99;
 
 export const PLAN_LIMITS = {
   free: {
