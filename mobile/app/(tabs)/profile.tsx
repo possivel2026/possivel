@@ -35,6 +35,7 @@ export default function ProfileScreen() {
         <Card style={styles.stat}><Text style={styles.statNumber}>{causes.data?.length ?? 0}</Text><Text style={typography.muted}>Causas</Text></Card>
       </View>
       <Card>
+        <Pressable style={styles.menu} onPress={() => router.push('/pro-library')}><Ionicons name="play-circle-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Possível Play e Biblioteca Pro</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
         <Pressable style={styles.menu} onPress={() => router.push('/plans')}><Ionicons name="diamond-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Planos Free e Pro</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
         <Pressable style={styles.menu} onPress={() => router.push('/notifications')}><Ionicons name="notifications-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Notificações</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
         <Pressable style={styles.menu} onPress={() => router.push('/settings/legal')}><Ionicons name="document-text-outline" color={colors.primary} size={22} /><Text style={styles.menuText}>Termos e privacidade</Text><Ionicons name="chevron-forward" color={colors.muted} size={20} /></Pressable>
