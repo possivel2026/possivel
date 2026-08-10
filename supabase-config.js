@@ -1,6 +1,6 @@
 window.POSSIVEL_SUPABASE = {
   url: 'https://nwymsiuwiqyvvmdagzeg.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Im53eW1zaXV3aXF5dnZtZGFnemVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1NDk1MTEsImV4cCI6MjEwMTEyNTUxMX0.PRlMlBncRxJDcbYtteGkQM86vcDlTSyPexsQB402I6Y',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eW1zaXV3aXF5dnZtZGFnemVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1NDk1MTEsImV4cCI6MjEwMTEyNTUxMX0.PRlMlBncRxJDcbYtteGkQM86vcDlTSyPexsQB402I6Y',
   checkoutFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-subscription-checkout',
   paymentFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-payment-checkout',
   callFunctionUrl: 'https://nwymsiuwiqyvvmdagzeg.supabase.co/functions/v1/create-call-room',
@@ -8,66 +8,84 @@ window.POSSIVEL_SUPABASE = {
   proPriceLabel: 'R$ 15,99/mês'
 };
 
-// Compatibilidade e estabilidade do cliente Supabase.
-// - resolve explicitamente o autor do post no PostgREST;
-// - reutiliza o primeiro cliente para os módulos extras;
-// - repete uma leitura de perfil quando houver falha transitória de rede/JWT.
+// Ajustes de compatibilidade do cliente Supabase.
+// 1) resolve explicitamente posts -> autor no PostgREST;
+// 2) reaproveita o cliente principal nos módulos extras;
+// 3) valida/renova uma sessão persistida antes de o app usar o JWT no banco.
 (() => {
   const sdk = window.supabase;
   if (!sdk?.createClient || sdk.__possivelClientFixes) return;
 
   const originalCreateClient = sdk.createClient.bind(sdk);
-  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  function isRetryable(result) {
-    if (!result?.error) return false;
-    const code = String(result.error.code || '').toLowerCase();
-    const message = String(result.error.message || '').toLowerCase();
-    const status = Number(result.status || 0);
-    return status === 0 || status === 401 || status === 408 || status === 429 || status >= 500 ||
-      code.includes('fetch') || message.includes('fetch') || message.includes('network') ||
-      message.includes('jwt') || message.includes('timeout') || message.includes('temporar');
-  }
-
-  function addRetry(query, client) {
-    if (!query || typeof query.then !== 'function' || query.__possivelRetry) return query;
-    const originalThen = query.then.bind(query);
-    query.__possivelRetry = true;
-    query.then = (onFulfilled, onRejected) => {
-      const execute = async () => {
-        let result = await originalThen((value) => value);
-        if (!isRetryable(result)) return result;
-
-        const status = Number(result?.status || 0);
-        const message = String(result?.error?.message || '').toLowerCase();
-        if (status === 401 || message.includes('jwt')) {
-          try { await client.auth.refreshSession(); } catch (_) { /* tenta novamente abaixo */ }
-        }
-        await wait(300);
-        result = await originalThen((value) => value);
-        return result;
-      };
-      return execute().then(onFulfilled, onRejected);
-    };
-    return query;
-  }
 
   sdk.createClient = (...args) => {
     const client = originalCreateClient(...args);
     if (!window.POSSIVEL_DB) window.POSSIVEL_DB = client;
+
     const originalFrom = client.from.bind(client);
+    const originalGetSession = client.auth.getSession.bind(client.auth);
+    const originalGetUser = client.auth.getUser.bind(client.auth);
+    const originalRefreshSession = client.auth.refreshSession.bind(client.auth);
+    const originalSignOut = client.auth.signOut.bind(client.auth);
+    let validatedAccessToken = null;
+    let validationInFlight = null;
+
+    function invalidSessionError(error) {
+      const status = Number(error?.status || 0);
+      const code = String(error?.code || '').toLowerCase();
+      const message = String(error?.message || '').toLowerCase();
+      return status === 401 || status === 403 || code.includes('jwt') ||
+        message.includes('jwt') || message.includes('token') ||
+        message.includes('session') || message.includes('refresh');
+    }
+
+    async function validateStoredSession(result) {
+      const session = result?.data?.session || null;
+      if (!session?.access_token) return result;
+      if (validatedAccessToken === session.access_token) return result;
+
+      try {
+        const { data: userData, error: userError } = await originalGetUser(session.access_token);
+        if (!userError && userData?.user) {
+          validatedAccessToken = session.access_token;
+          return result;
+        }
+
+        if (!invalidSessionError(userError)) return result;
+
+        const refreshed = await originalRefreshSession();
+        if (!refreshed.error && refreshed.data?.session?.access_token) {
+          validatedAccessToken = refreshed.data.session.access_token;
+          return { data: { session: refreshed.data.session }, error: null };
+        }
+
+        await originalSignOut({ scope: 'local' });
+        validatedAccessToken = null;
+        return { data: { session: null }, error: null };
+      } catch (error) {
+        return result;
+      }
+    }
+
+    client.auth.getSession = async (...sessionArgs) => {
+      const result = await originalGetSession(...sessionArgs);
+      if (!result?.data?.session) return result;
+      if (!validationInFlight) {
+        validationInFlight = validateStoredSession(result).finally(() => { validationInFlight = null; });
+      }
+      return validationInFlight;
+    };
 
     client.from = (relation) => {
       const builder = originalFrom(relation);
-      if (typeof builder?.select !== 'function') return builder;
+      if (relation !== 'posts' || typeof builder?.select !== 'function') return builder;
 
       const originalSelect = builder.select.bind(builder);
       builder.select = (columns = '*', options) => {
-        const resolvedColumns = relation === 'posts' && typeof columns === 'string'
+        const resolvedColumns = typeof columns === 'string'
           ? columns.replace(/\bprofiles\(/g, 'profiles!posts_author_id_fkey(')
           : columns;
-        const query = originalSelect(resolvedColumns, options);
-        return relation === 'profiles' ? addRetry(query, client) : query;
+        return originalSelect(resolvedColumns, options);
       };
       return builder;
     };
@@ -82,7 +100,7 @@ window.POSSIVEL_SUPABASE = {
   const loadExperience = () => {
     if (!document.querySelector('script[data-possivel-experience]')) {
       const script = document.createElement('script');
-      script.src = 'site-experience.js?v=20260809-3';
+      script.src = 'site-experience.js?v=20260809-4';
       script.dataset.possivelExperience = 'true';
       script.defer = true;
       document.head.append(script);
@@ -90,7 +108,7 @@ window.POSSIVEL_SUPABASE = {
 
     if (!document.querySelector('script[data-possivel-messages-filter]')) {
       const script = document.createElement('script');
-      script.src = 'messages-filter.js?v=20260809-3';
+      script.src = 'messages-filter.js?v=20260809-4';
       script.dataset.possivelMessagesFilter = 'true';
       script.defer = true;
       document.head.append(script);
