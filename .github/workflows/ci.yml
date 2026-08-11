@@ -11,7 +11,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --check script.js
+      - name: Validar JavaScript principal
+        run: node --check script.js
+      - name: Validar JavaScript dos microprodutos
+        run: node --check microprodutos/app.js
+      - name: Validar configuração Vercel dos microprodutos
+        run: node -e "JSON.parse(require('fs').readFileSync('microprodutos/vercel.json','utf8')); console.log('vercel.json ok')"
       - run: node tests/static-check.mjs
   mobile-manifests:
     runs-on: ubuntu-latest

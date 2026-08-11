@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Possível Labs: 10 ferramentas gratuitas para dinheiro, produtividade, carreira e negócios." />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="robots" content="index,follow" />
+  <title>Possível Labs — 10 ferramentas úteis</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="./app.js"></script>
+  <script defer src="./admin.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Possível Labs">
+      <span class="brand-mark">P</span><span>Possível <b>Labs</b></span>
+    </a>
+    <nav>
+      <a href="#ferramentas">Ferramentas</a>
+      <a href="#modelo">Como cresce</a>
+      <button id="creatorButton" class="creator-chip" type="button" aria-controls="creatorPanel">◆ Criador</button>
+      <button id="themeToggle" class="ghost" type="button">Tema</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="hero shell">
+      <div>
+        <span class="eyebrow">ECOSSISTEMA DE MICROPRODUTOS</span>
+        <h1>Ferramentas rápidas para resolver problemas reais.</h1>
+        <p>Dez utilitários gratuitos, leves e prontos para evoluir com login, pagamentos, anúncios, afiliados e API.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#ferramentas">Abrir ferramentas</a>
+          <a class="button secondary" href="https://github.com/possivel2026/possivel" target="_blank" rel="noreferrer">Ver GitHub</a>
+        </div>
+        <div class="creator-seal" title="Projeto oficial do criador">
+          <span class="seal-mark">W</span>
+          <span><b>Produto oficial</b><small>Wayne Corporation • Criador verificado</small></span>
+        </div>
+        <div class="metrics">
+          <div><strong>10</strong><span>produtos</span></div>
+          <div><strong>0</strong><span>cadastros exigidos</span></div>
+          <div><strong>100%</strong><span>responsivo</span></div>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <span class="status"><i></i> Release candidate</span>
+        <h2>Uma base, vários negócios</h2>
+        <p>Cada ferramenta pode virar um produto independente sem duplicar design, infraestrutura ou manutenção.</p>
+        <ul>
+          <li>SEO por ferramenta</li>
+          <li>Dados salvos no dispositivo</li>
+          <li>Arquitetura pronta para backend</li>
+          <li>Painel financeiro protegido no servidor</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="ferramentas" class="shell section">
+      <div class="section-head">
+        <div><span class="eyebrow">UTILIDADE PRIMEIRO</span><h2>Escolha uma ferramenta</h2></div>
+        <label class="search"><span>⌕</span><input id="searchTools" type="search" placeholder="Buscar ferramenta..." autocomplete="off" /></label>
+      </div>
+      <div id="toolGrid" class="tool-grid"></div>
+    </section>
+
+    <section id="workspace" class="workspace shell hidden" aria-live="polite">
+      <button id="closeWorkspace" class="back" type="button">← Voltar para ferramentas</button>
+      <div id="workspaceContent"></div>
+    </section>
+
+    <section id="modelo" class="shell section">
+      <div class="section-head"><div><span class="eyebrow">ESCALA INTELIGENTE</span><h2>Modelo de crescimento</h2></div></div>
+      <div class="model-grid">
+        <article><b>1</b><h3>Atrair</h3><p>Ferramentas gratuitas capturam buscas específicas no Google e tráfego social.</p></article>
+        <article><b>2</b><h3>Converter</h3><p>Recursos premium, exportações, histórico e automações aumentam o valor por usuário.</p></article>
+        <article><b>3</b><h3>Reter</h3><p>Conta única, dados sincronizados e notificações transformam visitas em recorrência.</p></article>
+        <article><b>4</b><h3>Monetizar</h3><p>Assinatura, anúncios, afiliados, geração de leads e API para empresas.</p></article>
+      </div>
+    </section>
+
+    <section id="creatorPanel" class="shell section creator-panel hidden" aria-labelledby="creatorTitle">
+      <div class="creator-panel-head">
+        <div><span class="eyebrow">ACESSO RESTRITO</span><h2 id="creatorTitle">Painel do Criador</h2><p id="creatorStatus">Autentique a conta autorizada.</p></div>
+        <button id="creatorClose" class="ghost" type="button">Fechar</button>
+      </div>
+
+      <div id="creatorAuth" class="admin-card">
+        <h3>Entrar como criador</h3>
+        <p>Somente a conta vinculada ao criador autorizado recebe acesso às métricas e solicitações financeiras.</p>
+        <form id="creatorLogin" class="form-grid" autocomplete="on">
+          <div class="field"><label for="creatorEmail">E-mail</label><input id="creatorEmail" type="email" autocomplete="username" required></div>
+          <div class="field"><label for="creatorPassword">Senha</label><input id="creatorPassword" type="password" autocomplete="current-password" required></div>
+          <div class="actions full"><button class="action" type="submit">Entrar no painel</button></div>
+        </form>
+      </div>
+
+      <div id="creatorDashboard" class="hidden">
+        <div class="admin-toolbar"><span id="creatorIdentity" class="creator-chip">Criador verificado • Wayne Corporation</span><button id="creatorLogout" class="ghost" type="button">Sair</button></div>
+        <div class="admin-metrics">
+          <article><span>Faturamento aprovado</span><strong id="metricGross">R$ 0,00</strong></article>
+          <article><span>Disponível para solicitar</span><strong id="metricAvailable">R$ 0,00</strong></article>
+          <article><span>Saques reservados</span><strong id="metricRequested">R$ 0,00</strong></article>
+          <article><span>Saques pagos</span><strong id="metricPaid">R$ 0,00</strong></article>
+        </div>
+        <div class="split admin-split">
+          <div class="admin-card">
+            <h3>Solicitar saque</h3>
+            <p>Destino financeiro identificado como <b>Wayne Corporation</b>. A liquidação depende da conta real do provedor de pagamentos configurada.</p>
+            <form id="withdrawForm">
+              <div class="field"><label for="withdrawAmount">Valor (R$)</label><input id="withdrawAmount" type="number" min="1" step="0.01" inputmode="decimal" required></div>
+              <div class="actions"><button class="action" type="submit">Registrar solicitação</button></div>
+            </form>
+          </div>
+          <div class="admin-card security-card"><h3>Segurança</h3><p>O painel não confia no botão ou no navegador para autorizar acesso. Cada consulta financeira é validada no backend contra a identidade da sessão.</p><p>Chaves privadas do Supabase e Mercado Pago devem existir apenas nas variáveis da Vercel.</p></div>
+        </div>
+        <div class="admin-card"><h3>Receitas recentes</h3><div class="table-wrap"><table><thead><tr><th>Data</th><th>Origem</th><th>Status</th><th>Valor</th></tr></thead><tbody id="revenueRows"></tbody></table></div></div>
+        <div class="admin-card"><h3>Solicitações de saque</h3><div class="table-wrap"><table><thead><tr><th>Data</th><th>Status</th><th>Destino</th><th>Valor</th></tr></thead><tbody id="withdrawRows"></tbody></table></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <div><strong>Possível Labs</strong><p>Produtos digitais úteis, simples e escaláveis.</p></div>
+    <span>Wayne Corporation • Produto oficial do criador</span>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
